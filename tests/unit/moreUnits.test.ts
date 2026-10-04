@@ -189,7 +189,7 @@ describe("CSV Row Validator", () => {
 
 describe("Date & Countdown Calculation", () => {
   it("calculates time remaining accurately", () => {
-    const futureDate = new Date(Date.now() + 1000 * 60 * 60 * 25).toISOString(); // 25 hours ahead
+    const futureDate = new Date(Date.now() + 1000 * (60 * 60 * 25 + 10)).toISOString(); // 25 hours and 10 seconds ahead
     const remaining = calculateTimeRemaining(futureDate);
     expect(remaining.isExpired).toBe(false);
     expect(remaining.days).toBe(1);

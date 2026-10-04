@@ -4,7 +4,7 @@
 - [x] **Phase 1: Foundation** (COMPLETED & VERIFIED)
 - [x] **Phase 2: Design system and global UI** (COMPLETED & VERIFIED)
 - [x] **Phase 3: Catalogue** (COMPLETED & VERIFIED)
-- [ ] **Phase 4: Enquiry engine** (PENDING)
+- [x] **Phase 4: Enquiry engine** (COMPLETED & VERIFIED)
 - [ ] **Phase 5: Admin auth and dashboard** (PENDING)
 - [ ] **Phase 6: Admin catalogue** (PENDING)
 - [ ] **Phase 7: Admin enquiries, content and settings** (PENDING)
@@ -98,8 +98,33 @@
 
 ---
 
+## Phase 4: Enquiry Engine — Summary
+- **Core Engine & Security**:
+  - `src/lib/services/enquiryService.ts`: Atomic transaction creating gap-free enquiry number from `Counter`, full per-item and rule snapshots, immutable `originalSnapshot`, initial customer status history, and `OutboxEvent` generation.
+  - `src/lib/security/rateLimiter.ts`: Serverless-compatible database-backed rate limiter on `RateLimit` table with SHA-256 salted IP hashing.
+  - `src/lib/utils/token.ts`: HMAC-SHA256 token generator and constant-time buffer verifier (`verifyEnquiryToken`) for protecting customer confirmation and printable estimate access.
+  - `src/lib/services/whatsapp.ts`: Pure function generating encoded `wa.me` URL with automatic multi-item fallback truncation safely under 1,400 chars.
+  - `src/lib/services/outboxService.ts` & `src/scripts/runOutbox.ts`: Notification queue runner with exponential backoff and dead-letter queueing.
+- **Public Routes & Endpoints**:
+  - `POST /api/enquiries`: Rate-limited submission handler validating customer details and items with Zod, detecting `PRICE_CHANGED` (409 Conflict), `ITEM_UNAVAILABLE` (409), `BELOW_MINIMUM` (409), and bot honeypot traps.
+  - `POST /api/enquiries/track`: Privacy-first customer tracking endpoint matching enquiry number and registered mobile. Hides internal staff notes and customer address details.
+  - `GET & POST /api/cron/outbox`: Protected outbox processing endpoint guarded by `CRON_SECRET`.
+  - `GET /api/states`: Public list of all 36 Indian states and active regional delivery rules.
+  - `/enquiry`: Customer review and submission page with live minimum-order progress meter, regional rule banners, 18+ statutory checkbox, honeypot, and cart management.
+  - `/enquiry/success/[number]`: Token-protected confirmation page with festive celebration UI, mandatory "This is an Enquiry, NOT an Order" alert, one-click WhatsApp confirmation CTA, and Call button.
+  - `/enquiry/summary/[number]`: Token-protected printable estimate document explicitly titled "ENQUIRY / ESTIMATE" with print styles (`@media print`).
+  - `/track-enquiry`: Customer tracking portal with 7-stage vertical progress stepper, carrier tracking (Transporter & LR number), and WhatsApp escalation button.
+- **Verification Gates**:
+  - `npm run typecheck`: PASSED (0 errors)
+  - `npm run lint`: PASSED (0 warnings, 0 errors)
+  - `npm run test`: PASSED (42/42 tests passing across 7 test suites, including real PostgreSQL integration tests)
+  - `npm run build`: PASSED (20/20 routes compiled successfully)
+
+---
+
 ## Architectural Decisions & Observations
 1. **Integer Paise Representation**: All price fields (`mrpPaise`, `pricePaise`, `subtotalPaise`, `minOrderPaise`) strictly use integers.
 2. **PostgreSQL Database**: Configured cluster with UTF8 encoding to natively support INR symbol (`₹`) and `pg_trgm` extension.
 3. **Optimistic Locking**: Implemented via integer `version` field; verified that stale edits fail cleanly without overwriting concurrent modifications.
 4. **Catalogue Flexibility**: Both tabular quick-order view (popular with bulk festive shoppers) and visual card view are supported with synchronized URL query parameters.
+5. **Enquiry Integrity & Privacy**: Customer tracking and estimate printouts strictly isolate customer-facing timelines while concealing internal staff notes and preventing phone enumeration attacks.
