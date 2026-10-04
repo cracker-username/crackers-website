@@ -74,3 +74,52 @@ export function calculateTimeRemaining(targetIso: string): {
 
   return { totalMs: diff, days, hours, minutes, seconds, isExpired: false };
 }
+
+/**
+ * Get year, month, day in Asia/Kolkata timezone
+ */
+export function getIstDateParts(date: Date = new Date()): { year: number; month: number; day: number } {
+  const parts = new Intl.DateTimeFormat("en-US", {
+    timeZone: IST_TIMEZONE,
+    year: "numeric",
+    month: "numeric",
+    day: "numeric",
+  }).formatToParts(date);
+
+  const year = parseInt(parts.find((p) => p.type === "year")!.value, 10);
+  const month = parseInt(parts.find((p) => p.type === "month")!.value, 10);
+  const day = parseInt(parts.find((p) => p.type === "day")!.value, 10);
+  return { year, month, day };
+}
+
+/**
+ * Returns UTC Date object representing 00:00:00 IST of today
+ */
+export function getIstStartOfToday(): Date {
+  const { year, month, day } = getIstDateParts();
+  const m = String(month).padStart(2, "0");
+  const d = String(day).padStart(2, "0");
+  return new Date(`${year}-${m}-${d}T00:00:00+05:30`);
+}
+
+/**
+ * Returns UTC Date object representing 00:00:00 IST of current week Monday
+ */
+export function getIstStartOfWeek(): Date {
+  const todayStart = getIstStartOfToday();
+  // Get day of week in IST
+  const formatter = new Intl.DateTimeFormat("en-US", { timeZone: IST_TIMEZONE, weekday: "short" });
+  const dayName = formatter.format(todayStart);
+  const dayMap: Record<string, number> = { Mon: 0, Tue: 1, Wed: 2, Thu: 3, Fri: 4, Sat: 5, Sun: 6 };
+  const diffDays = dayMap[dayName] ?? 0;
+  return new Date(todayStart.getTime() - diffDays * 86400000);
+}
+
+/**
+ * Returns UTC Date object representing 00:00:00 IST of N days ago
+ */
+export function getIstDaysAgo(days: number): Date {
+  const todayStart = getIstStartOfToday();
+  return new Date(todayStart.getTime() - days * 86400000);
+}
+

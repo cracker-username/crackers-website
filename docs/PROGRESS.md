@@ -5,7 +5,7 @@
 - [x] **Phase 2: Design system and global UI** (COMPLETED & VERIFIED)
 - [x] **Phase 3: Catalogue** (COMPLETED & VERIFIED)
 - [x] **Phase 4: Enquiry engine** (COMPLETED & VERIFIED)
-- [ ] **Phase 5: Admin auth and dashboard** (PENDING)
+- [x] **Phase 5: Admin auth and dashboard** (COMPLETED & VERIFIED)
 - [ ] **Phase 6: Admin catalogue** (PENDING)
 - [ ] **Phase 7: Admin enquiries, content and settings** (PENDING)
 - [ ] **Phase 8: Integration, security, SEO, performance** (PENDING)
@@ -122,9 +122,43 @@
 
 ---
 
+## Phase 5: Admin Auth & Dashboard — Summary
+- **Authentication & Security Architecture**:
+  - `src/lib/auth/jwt.ts`: 8-hour JWT signed with `jose` HS256 algorithm.
+  - `src/lib/auth/permissions.ts`: Strict RBAC permissions matrix separating `SUPER_ADMIN` and `STAFF`.
+  - `src/lib/auth/session.ts`: `getAdminSession()` verifying session and loading live database state on every call; `withAdminAuth(permission, handler)` server action and API route guard.
+  - `src/middleware.ts`: Next.js middleware protecting `/admin/**` routes (redirects to `/admin/login`) and injecting `X-Robots-Tag: noindex, nofollow`.
+  - Security policies: Account lockout for 15 minutes after 5 consecutive failed login attempts; password length >= 10; bcrypt cost 12; token version invalidation ("log out everywhere"); first login password change enforcement (`mustChangePassword`).
+- **Admin Endpoints & UI**:
+  - `POST /api/admin/auth/login`: IP rate-limited login handler with brute-force lockout and audit logging.
+  - `POST /api/admin/auth/logout`: Clears `admin_session` cookie.
+  - `POST /api/admin/auth/change-password`: Validates current password, updates to new bcrypt hash (cost 12), and clears `mustChangePassword`.
+  - `POST /api/admin/auth/logout-everywhere`: Increments `tokenVersion` to invalidate all active session tokens.
+  - `GET /api/admin/enquiries/count`: Polled every 30 seconds by sidebar badge for live new enquiry notifications.
+  - `/admin/login`: Clean, festive dark theme admin sign-in portal.
+  - `/admin/(dashboard)/layout.tsx`: Collapsible mobile drawer, active user role badge, change password modal, and live polling badge.
+  - `/admin/(dashboard)`: Real-time operations dashboard with IST day-boundary metrics:
+    - Enquiries Today (IST)
+    - Enquiries This Week (IST)
+    - Total Enquiries & Pipeline Estimated Value in ₹
+    - "Confirmed or Later" conversion share (%)
+    - 7-Day Performance Trend Chart (daily enquiry volumes)
+    - 9-Status Operational Breakdown Grid
+    - Inventory Health Alerts (Out of Stock & Limited Stock counts)
+    - Top Fireworks Demand Products & Top Regional States
+    - Recent Customer Enquiries Feed
+- **Verification Gates**:
+  - `npm run typecheck`: PASSED (0 errors)
+  - `npm run lint`: PASSED (0 warnings, 0 errors)
+  - `npm run test`: PASSED (49/49 tests passing across 9 test suites, including real PostgreSQL authentication & lockout tests)
+  - `npm run build`: PASSED (23/23 routes compiled successfully)
+
+---
+
 ## Architectural Decisions & Observations
 1. **Integer Paise Representation**: All price fields (`mrpPaise`, `pricePaise`, `subtotalPaise`, `minOrderPaise`) strictly use integers.
 2. **PostgreSQL Database**: Configured cluster with UTF8 encoding to natively support INR symbol (`₹`) and `pg_trgm` extension.
 3. **Optimistic Locking**: Implemented via integer `version` field; verified that stale edits fail cleanly without overwriting concurrent modifications.
 4. **Catalogue Flexibility**: Both tabular quick-order view (popular with bulk festive shoppers) and visual card view are supported with synchronized URL query parameters.
 5. **Enquiry Integrity & Privacy**: Customer tracking and estimate printouts strictly isolate customer-facing timelines while concealing internal staff notes and preventing phone enumeration attacks.
+6. **Live DB Auth Verification**: Middleware redirects unauthenticated requests, but `withAdminAuth` re-verifies `isActive` and `tokenVersion` from real PostgreSQL on every request so deactivations and password changes take immediate effect.
