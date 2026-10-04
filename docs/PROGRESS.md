@@ -3,7 +3,7 @@
 ## Phase Overview
 - [x] **Phase 1: Foundation** (COMPLETED & VERIFIED)
 - [x] **Phase 2: Design system and global UI** (COMPLETED & VERIFIED)
-- [ ] **Phase 3: Catalogue** (READY)
+- [x] **Phase 3: Catalogue** (COMPLETED & VERIFIED)
 - [ ] **Phase 4: Enquiry engine** (PENDING)
 - [ ] **Phase 5: Admin auth and dashboard** (PENDING)
 - [ ] **Phase 6: Admin catalogue** (PENDING)
@@ -72,7 +72,34 @@
 
 ---
 
+## Phase 3: Catalogue & Public Pages — Summary
+- **Product Card & Quick Order Views**:
+  - `src/components/public/ProductCard.tsx`: Grid & list view card with discount badge, stock status pill, quantity stepper, "Add to Enquiry" microcopy, visual spark burst animation, and Quick View trigger.
+  - `src/components/public/QuickOrderTable.tsx`: High-speed Sivakasi festival tabular price list grouped by category with live row subtotals, inline quantity adjustments, and stock status indicators.
+  - `src/components/public/QuickViewModal.tsx`: Accessible modal displaying pack size, piece details, description, safety tips, and live quantity stepper.
+  - `src/components/public/StickyEnquiryBar.tsx`: Mobile & desktop bottom bar summarizing item count, subtotal, and link to review enquiry.
+  - `src/components/public/PriceListFilterBar.tsx`: Filter bar supporting search query, category selection, stock filter, sort order (price asc/desc, name, discount), and view switch (Grid vs Table) synchronized with URL search params.
+- **Catalogue & Static Routes**:
+  - `/price-list`: Full festive catalogue supporting both High-Speed Table Mode and Visual Grid Mode with URL-synced search, sorting, filtering, and live cart syncing.
+  - `/collections/[slug]`: Dedicated category collection page with category hero gradient, descriptions, and product grid.
+  - `/products/[slug]`: Detailed product showcase with product gallery, pack specs, safety guidance, direct WhatsApp/Call enquiry buttons, and related items.
+  - `/combos`: Dedicated family and mega festival combo packs with item breakdowns, savings calculations, and one-click add to enquiry.
+  - `/about`: Authentic Sivakasi manufacturing heritage, history, compliance standards, and ethical craftsmanship.
+  - `/contact`: Official contact information, Sivakasi warehouse address, phone/WhatsApp links, and map info.
+  - `/faq`: Accordion FAQ loaded from PostgreSQL seed data categorized by Ordering, Delivery, and Safety.
+  - `/safety`: Comprehensive fireworks safety guidelines, Dos and Don'ts, emergency protocols, and adult supervision requirements.
+  - `/legal/[slug]`: Dynamic legal markdown page (Terms, Privacy, Delivery Policy, Safety Notice, Compliance Notice) loaded from database with fallback neutral templates.
+  - `/_not-found`: Custom festival 404 page with return-to-catalogue navigation.
+- **Verification Gates**:
+  - `npm run typecheck`: PASSED (0 errors)
+  - `npm run lint`: PASSED (0 warnings, 0 errors)
+  - `npm run test`: PASSED (31/31 tests passing)
+  - `npm run build`: PASSED (11/11 static/dynamic routes compiled successfully)
+
+---
+
 ## Architectural Decisions & Observations
 1. **Integer Paise Representation**: All price fields (`mrpPaise`, `pricePaise`, `subtotalPaise`, `minOrderPaise`) strictly use integers.
 2. **PostgreSQL Database**: Configured cluster with UTF8 encoding to natively support INR symbol (`₹`) and `pg_trgm` extension.
 3. **Optimistic Locking**: Implemented via integer `version` field; verified that stale edits fail cleanly without overwriting concurrent modifications.
+4. **Catalogue Flexibility**: Both tabular quick-order view (popular with bulk festive shoppers) and visual card view are supported with synchronized URL query parameters.
