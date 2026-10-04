@@ -2,8 +2,8 @@
 
 ## Phase Overview
 - [x] **Phase 1: Foundation** (COMPLETED & VERIFIED)
-- [ ] **Phase 2: Design system and global UI** (READY)
-- [ ] **Phase 3: Catalogue** (PENDING)
+- [x] **Phase 2: Design system and global UI** (COMPLETED & VERIFIED)
+- [ ] **Phase 3: Catalogue** (READY)
 - [ ] **Phase 4: Enquiry engine** (PENDING)
 - [ ] **Phase 5: Admin auth and dashboard** (PENDING)
 - [ ] **Phase 6: Admin catalogue** (PENDING)
@@ -46,6 +46,29 @@
   - `npm run lint`: PASSED (0 warnings, 0 errors)
   - `npm run test`: PASSED (25/25 tests across 3 test files, including real PostgreSQL concurrency & idempotency)
   - `npm run build`: PASSED (production build succeeded)
+
+---
+
+## Phase 2: Design System & Global UI — Summary
+- **Cart Store**: `src/store/useCartStore.ts` implemented with Zustand and persist middleware. Strictly persists items, quantities, and selected state only in localStorage with SSR/hydration safety.
+- **Theme Architecture**: Dark theme default with light theme support and persistent toggle via `src/components/ui/ThemeToggle.tsx`. WCAG AA contrast prices (`#FFC83D` dark, `#B8860B` light).
+- **Fireworks Canvas**: Native HTML5 `<canvas>` fireworks (`src/components/canvas/FireworksCanvas.tsx`) with capped particles (max 60), capped DPR (max 2), paused when off-screen via `IntersectionObserver` or tab hidden via `visibilitychange`, and static gradient for `prefers-reduced-motion`.
+- **Global Shell & Components**:
+  - `src/components/public/AnnouncementBar.tsx`: Dynamic marquee banner with pause on hover; hidden if disabled/empty.
+  - `src/components/public/Header.tsx`: Sticky navigation with logo, brand links, search trigger (`Ctrl+K`), animated cart bump counter, theme toggle, Call and WhatsApp buttons.
+  - `src/components/public/MobileNav.tsx`: 5-item bottom mobile navigation with 48px touch targets and live count badge.
+  - `src/components/public/FloatingWhatsApp.tsx`: Mobile-safe launcher positioned to avoid bottom navigation and cart overlaps.
+  - `src/components/public/TrustStrip.tsx`: Authentic Sivakasi badges; licence badge rendered conditionally.
+  - `src/components/public/Footer.tsx`: Comprehensive footer with brand information, policy links, contact details, statutory fireworks notice, and smooth back-to-top button.
+  - `src/components/public/AgeConsentModal.tsx`: Statutory 18+ verification modal remembered in localStorage.
+  - `src/components/public/CommandPalette.tsx`: Debounced fast search modal triggered via `Ctrl+K` and `/` querying real PostgreSQL via `src/app/api/search/route.ts`.
+  - `src/components/public/EnquiryDrawer.tsx`: Slide-out enquiry list with live minimum order progress meter (regional rules applied) and quantity steppers.
+  - `src/components/public/Hero.tsx`: Dynamic fireworks hero with IST-aware countdown timer.
+- **Verification Gates**:
+  - `npm run typecheck`: PASSED (0 errors)
+  - `npm run lint`: PASSED (0 warnings, 0 errors)
+  - `npm run test`: PASSED (28/28 tests)
+  - `npm run build`: PASSED (0 errors)
 
 ---
 
