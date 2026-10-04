@@ -83,8 +83,57 @@ export default async function ProductPage({ params }: ProductPageProps) {
         { label: "Manufacturer Brand", value: product.brand || "[BRAND_NAME]" },
       ];
 
+  const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL || "https://crackers.local").replace(/\/$/, "");
+
+  const breadcrumbJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": siteUrl,
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": product.category.name,
+        "item": `${siteUrl}/collections/${product.category.slug}`,
+      },
+      {
+        "@type": "ListItem",
+        "position": 3,
+        "name": product.name,
+        "item": `${siteUrl}/products/${product.slug}`,
+      },
+    ],
+  };
+
+  const productJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    name: product.name,
+    sku: product.sku,
+    description: product.shortDesc || product.longDesc || product.name,
+    category: product.category.name,
+    image: product.images.map((img) => img.url),
+    brand: {
+      "@type": "Brand",
+      name: product.brand || brandName,
+    },
+  };
+
   return (
     <div className="w-full min-h-screen py-8 md:py-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto pb-32">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(productJsonLd) }}
+      />
       {/* Breadcrumb Navigation */}
       <nav aria-label="Breadcrumb" className="flex items-center gap-2 text-xs text-text-muted mb-6">
         <Link href="/" className="hover:text-foreground">Home</Link>

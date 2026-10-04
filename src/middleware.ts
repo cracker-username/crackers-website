@@ -9,6 +9,25 @@ const ADMIN_COOKIE_NAME = "admin_session";
 export async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
 
+  // Handle CSRF protection on admin API routes
+  if (pathname.startsWith("/api/admin")) {
+    const method = req.method.toUpperCase();
+    if (["POST", "PUT", "PATCH", "DELETE"].includes(method)) {
+      const origin = req.headers.get("origin");
+      const host = req.headers.get("host");
+      if (origin && host) {
+        const originHost = new URL(origin).host;
+        if (originHost !== host) {
+          return NextResponse.json(
+            { ok: false, code: "CSRF_FORBIDDEN", message: "Cross-origin requests not allowed." },
+            { status: 403 }
+          );
+        }
+      }
+    }
+    return NextResponse.next();
+  }
+
   // Only handle /admin routes
   if (pathname.startsWith("/admin")) {
     const response = NextResponse.next();
@@ -56,5 +75,5 @@ export async function middleware(req: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/admin/:path*"],
+  matcher: ["/admin/:path*", "/api/admin/:path*"],
 };

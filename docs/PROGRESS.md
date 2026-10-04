@@ -8,7 +8,7 @@
 - [x] **Phase 5: Admin auth and dashboard** (COMPLETED & VERIFIED)
 - [x] **Phase 6: Admin catalogue** (COMPLETED & VERIFIED)
 - [x] **Phase 7: Admin enquiries, content and settings** (COMPLETED & VERIFIED)
-- [ ] **Phase 8: Integration, security, SEO, performance** (PENDING)
+- [x] **Phase 8: Integration, security, SEO, performance** (COMPLETED & VERIFIED)
 - [ ] **Phase 9: Full QA** (PENDING)
 - [ ] **Phase 10: Final production audit** (PENDING)
 
@@ -224,6 +224,29 @@
 
 ---
 
+## Phase 8: Integration, Security, SEO, Performance — Summary
+- **Content-Security-Policy & Security Headers**:
+  - `next.config.ts`: Added strict Content-Security-Policy (CSP) headers protecting against script injection and clickjacking while permitting authorized static assets (`res.cloudinary.com`, `images.unsplash.com`, data URI images, Google Fonts). Configured `X-Frame-Options: DENY`, `X-Content-Type-Options: nosniff`, `Referrer-Policy: strict-origin-when-cross-origin`, and `Permissions-Policy`.
+  - `src/middleware.ts`: Enhanced with CSRF origin validation on state-mutating requests (`POST`, `PUT`, `PATCH`, `DELETE`) to `/api/admin/**`. Enforced `X-Robots-Tag: noindex, nofollow` on all `/admin` routes.
+- **Dynamic SEO Sitemap & Robots Exclusion**:
+  - `src/app/sitemap.ts`: Generates dynamic `/sitemap.xml` mapping all active products, categories, combos, and public content pages. Strictly excludes administrative routes and internal APIs.
+  - `src/app/robots.ts`: Generates dynamic `/robots.txt` disallowing `/admin/` and `/api/` while declaring the sitemap index.
+- **Structured Data (JSON-LD)**:
+  - `src/app/layout.tsx`: Injected `LocalBusiness` / `Organization` JSON-LD schema using real database settings (business name, telephone, official Sivakasi address, operating hours).
+  - `src/app/faq/page.tsx`: Injected `FAQPage` JSON-LD schema dynamically mapping active FAQs from PostgreSQL.
+  - `src/app/products/[slug]/page.tsx`: Injected `Product` schema with conservative representation (product name, description, SKU, brand, category, images) without purchasable checkout `offers` to respect the legal enquiry-first model. Added `BreadcrumbList` schema.
+  - `src/app/collections/[slug]/page.tsx` & `src/app/price-list/page.tsx`: Injected `BreadcrumbList` schema.
+- **Serverless PostgreSQL Rate Limiting & Privacy**:
+  - `src/lib/security/rateLimiter.ts`: Verified atomic upsert rate limiting on `RateLimit` table applied to login (`/api/admin/auth/login`), enquiry submission (`/api/enquiries`), and tracking lookup (`/api/enquiries/track`).
+  - Salted SHA-256 IP hashing (`hashIp`) ensures client privacy while preventing enumeration attacks.
+- **Verification Gates**:
+  - `npm run typecheck`: PASSED (0 errors)
+  - `npm run lint`: PASSED (0 warnings, 0 errors)
+  - `npm run test`: PASSED (80/80 tests passing across 12 test suites, including security and SEO integration tests)
+  - `npm run build`: PASSED (56/56 static and dynamic routes compiled successfully)
+
+---
+
 ## Architectural Decisions & Observations
 1. **Integer Paise Representation**: All price fields (`mrpPaise`, `pricePaise`, `subtotalPaise`, `minOrderPaise`) strictly use integers.
 2. **PostgreSQL Database**: Configured cluster with UTF8 encoding to natively support INR symbol (`₹`) and `pg_trgm` extension.
@@ -235,3 +258,6 @@
 8. **Test Serial Execution**: Configured Vitest `fileParallelism: false` so that integration test suites running real PostgreSQL transactions (gap-free counters, concurrency) do not cross-interfere.
 9. **Enquiry Revision Immutability**: The original customer submission (`originalSnapshot`) is strictly read-only and preserved permanently. All staff changes create new sequential revision records with author attribution and mandatory reason.
 10. **Role-Based Access Control**: `STAFF` users are strictly restricted to enquiries and catalogue views, preventing access to delivery rules, global system settings, staff credentials, and bulk pricing.
+11. **Serverless Rate Limiting**: Centralized atomic upsert on the `RateLimit` table provides scalable rate limiting without in-memory state or cold-start vulnerabilities.
+12. **Content-Security-Policy & CSRF Guard**: Strict CSP directives allow required local fonts and images while forbidding unauthorized origins, and middleware validates the `Origin` header for state-mutating admin requests.
+13. **Conservative Product Schema**: Schema.org `Product` structured data represents catalogue items accurately without purchasable `offers` checkout promises, strictly honoring the enquiry-only model.
