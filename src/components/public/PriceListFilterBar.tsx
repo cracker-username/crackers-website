@@ -22,7 +22,7 @@ interface CategoryOption {
 interface PriceListFilterBarProps {
   categories: CategoryOption[];
   viewMode: "cards" | "table";
-  onViewChange: (view: "cards" | "table") => void;
+  onViewChange?: (view: "cards" | "table") => void;
   totalCount: number;
 }
 
@@ -118,7 +118,10 @@ export function PriceListFilterBar({
           {/* View Toggles (Cards vs Quick Order Table) */}
           <div className="inline-flex rounded-xl bg-white/5 border border-white/10 p-1">
             <button
-              onClick={() => onViewChange("cards")}
+              onClick={() => {
+                updateQueryParam({ view: "cards" });
+                onViewChange?.("cards");
+              }}
               className={`p-2 rounded-lg transition-colors ${
                 viewMode === "cards"
                   ? "bg-accent-magenta text-white shadow-sm"
@@ -130,7 +133,10 @@ export function PriceListFilterBar({
               <LayoutGrid className="w-4 h-4" />
             </button>
             <button
-              onClick={() => onViewChange("table")}
+              onClick={() => {
+                updateQueryParam({ view: "table" });
+                onViewChange?.("table");
+              }}
               className={`p-2 rounded-lg transition-colors ${
                 viewMode === "table"
                   ? "bg-accent-magenta text-white shadow-sm"

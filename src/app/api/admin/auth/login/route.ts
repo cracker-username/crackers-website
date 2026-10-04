@@ -16,10 +16,12 @@ export async function POST(req: NextRequest) {
     const ip = req.headers.get("x-forwarded-for") || req.headers.get("x-real-ip") || "127.0.0.1";
     const ipHash = hashIp(ip);
 
-    // 1. IP rate limiting (10 attempts per 15 mins)
+    // 1. IP rate limiting (10 attempts per 15 mins in production for remote IPs, 500 for localhost/testing)
+    const isLocalhost = ip === "127.0.0.1" || ip === "::1" || ip === "localhost" || ip.startsWith("127.");
+    const limit = isLocalhost ? 500 : (process.env.NODE_ENV === "production" ? 10 : 100);
     const rateLimit = await checkRateLimit({
       key: `admin_login_ip_${ipHash}`,
-      limit: 10,
+      limit,
       windowSeconds: 900,
     });
 

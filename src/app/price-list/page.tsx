@@ -179,13 +179,6 @@ export default async function PriceListPage({ searchParams }: PriceListPageProps
               colorTo: c.colorTo,
             }))}
             viewMode={viewMode}
-            onViewChange={(mode) => {
-              // Handled by URL param sync via component
-              const url = new URL(window.location.href);
-              url.searchParams.set("view", mode);
-              window.history.replaceState({}, "", url.toString());
-              window.location.reload();
-            }}
             totalCount={totalCount}
           />
         </Suspense>

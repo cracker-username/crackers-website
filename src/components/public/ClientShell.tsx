@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import { usePathname } from "next/navigation";
 import { Header } from "./Header";
 import { MobileNav } from "./MobileNav";
 import { FloatingWhatsApp } from "./FloatingWhatsApp";
@@ -37,6 +38,11 @@ export function ClientShell({
 }: ClientShellProps) {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isEnquiryOpen, setIsEnquiryOpen] = useState(false);
+  const pathname = usePathname();
+
+  if (pathname?.startsWith("/admin")) {
+    return <div className="min-h-screen bg-bg-0 text-foreground">{children}</div>;
+  }
 
   return (
     <div className="min-h-screen flex flex-col bg-bg-0 text-foreground selection:bg-accent-magenta selection:text-white">

@@ -19,7 +19,10 @@ export default defineConfig({
     },
     {
       name: "Tablet",
-      use: { ...devices["iPad (gen 7)"], viewport: { width: 768, height: 1024 } },
+      use: {
+        browserName: "chromium",
+        viewport: { width: 768, height: 1024 },
+      },
     },
     {
       name: "Mobile Chrome",
@@ -27,7 +30,7 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command: "npm run dev",
+    command: "npm run start",
     url: "http://localhost:3000",
     reuseExistingServer: !process.env.CI,
     timeout: 120000,

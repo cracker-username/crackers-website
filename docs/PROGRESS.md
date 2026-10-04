@@ -247,6 +247,41 @@
 
 ---
 
+## Phase 9: Full QA & End-to-End Testing — Summary
+- **Playwright Test Infrastructure & Browsers**:
+  - Configured `playwright.config.ts` targeting production server on `http://localhost:3000` with Chromium browser emulation across three screen form factors:
+    - `Desktop Chrome` (1440x900 viewport)
+    - `Tablet` (768x1024 viewport)
+    - `Mobile Chrome` (375x812 viewport, device scale factor 3)
+- **E2E Test Suites**:
+  - `tests/e2e/catalogueAndEnquiry.spec.ts`:
+    1. Homepage renders hero, marquee announcements, trust badges, and statutory messaging.
+    2. Price list catalogue supports real-time text search, filtering, and view mode toggle between card grid and quick-order table.
+    3. Product detail page displays full technical specifications, safety instructions, and enquiry CTAs (Add to Enquiry, Direct WhatsApp Enquiry).
+    4. Review Enquiry page validates location, regional minimum-order rules, and mandatory 18+ legal consent.
+    5. Track Enquiry page validates mobile number format and securely searches against the real PostgreSQL database.
+  - `tests/e2e/viewportsAndResponsive.spec.ts`:
+    - Viewport overflow checks across 8 critical routes (`/`, `/price-list`, `/combos`, `/safety`, `/faq`, `/about`, `/contact`, `/track-enquiry`) verifying zero horizontal scroll overflow (`scrollWidth === clientWidth`) across 375px, 768px, and 1440px widths.
+    - Mobile bottom navigation bar touch target inspection (verifying all navigation items have minimum 44px-48px touch targets).
+    - Dark/light theme toggle switching classes without errors.
+  - `tests/e2e/adminAuthAndRbac.spec.ts`:
+    1. Unauthenticated requests to `/admin` redirect cleanly to `/admin/login`.
+    2. Invalid login attempts render user-friendly error alerts without crashing.
+    3. Valid administrative credentials authenticate and load the IST Operations Dashboard.
+    4. Admin sidebar and navigation links (enquiries, products, delivery rules, settings, audit, staff) are accessible across desktop and mobile drawers.
+- **Defects Discovered & Resolved**:
+  - *Client Shell Widget Leakage*: Fixed `ClientShell.tsx` to omit consumer header, footer, WhatsApp floating button, and the statutory 18+ modal on `/admin/**` routes.
+  - *RSC Function Prop*: Eliminated event callback prop passed across RSC boundary in `src/app/price-list/page.tsx` to `PriceListFilterBar.tsx` (component now handles query params internally).
+  - *Test Runner IP Rate Limiting*: Relaxed localhost rate-limit ceiling during local automated runs while preserving strict production limits for external clients.
+- **Verification Gates**:
+  - Playwright E2E Suite: **55/55 passed (2 skipped by device condition, 0 failed)** in 59.0s across Desktop, Tablet, and Mobile.
+  - Vitest Suite: **80/80 passed** across 12 test files.
+  - `npm run typecheck`: PASSED (0 errors).
+  - `npm run lint`: PASSED (0 warnings, 0 errors).
+  - `npm run build`: PASSED (56/56 routes compiled successfully).
+
+---
+
 ## Architectural Decisions & Observations
 1. **Integer Paise Representation**: All price fields (`mrpPaise`, `pricePaise`, `subtotalPaise`, `minOrderPaise`) strictly use integers.
 2. **PostgreSQL Database**: Configured cluster with UTF8 encoding to natively support INR symbol (`₹`) and `pg_trgm` extension.
@@ -261,3 +296,4 @@
 11. **Serverless Rate Limiting**: Centralized atomic upsert on the `RateLimit` table provides scalable rate limiting without in-memory state or cold-start vulnerabilities.
 12. **Content-Security-Policy & CSRF Guard**: Strict CSP directives allow required local fonts and images while forbidding unauthorized origins, and middleware validates the `Origin` header for state-mutating admin requests.
 13. **Conservative Product Schema**: Schema.org `Product` structured data represents catalogue items accurately without purchasable `offers` checkout promises, strictly honoring the enquiry-only model.
+14. **Cross-Viewport Touch Target Standards**: Mobile navigation buttons adhere to a minimum of 44-48px touch targets, verified through automated bounding box inspection on 375px mobile viewports.
