@@ -6,7 +6,7 @@
 - [x] **Phase 3: Catalogue** (COMPLETED & VERIFIED)
 - [x] **Phase 4: Enquiry engine** (COMPLETED & VERIFIED)
 - [x] **Phase 5: Admin auth and dashboard** (COMPLETED & VERIFIED)
-- [ ] **Phase 6: Admin catalogue** (PENDING)
+- [x] **Phase 6: Admin catalogue** (COMPLETED & VERIFIED)
 - [ ] **Phase 7: Admin enquiries, content and settings** (PENDING)
 - [ ] **Phase 8: Integration, security, SEO, performance** (PENDING)
 - [ ] **Phase 9: Full QA** (PENDING)
@@ -155,10 +155,42 @@
 
 ---
 
+## Phase 6: Admin Catalogue — Summary
+- **Products Management & Optimistic Locking**:
+  - `src/components/admin/ProductTable.tsx`: Full operations table with live pagination, debounced search, category filter, availability filter, multiselect row checkboxes, bulk actions bar, and quick toggles.
+  - `src/components/admin/ProductModal.tsx`: Product create/edit modal with live MRP-to-Price discount calculation, stock alert indicators, primary image picker, and optimistic locking (`version`).
+  - `src/app/api/admin/products`: CRUD endpoint with search, pagination, category filtering, and activity filtering.
+  - `src/app/api/admin/products/[id]`: Optimistic locking check (`current.version === clientVersion`). If versions diverge, rejects with HTTP 409 Conflict (`VERSION_CONFLICT`). Atomic version increment and audit logging (`PRODUCT_UPDATE`).
+- **Bulk Operations & Bulk Price Wizard**:
+  - `src/components/admin/BulkPriceModal.tsx`: Visual preview table comparing current price vs. proposed price, percentage discount adjustments, nearest ₹1 rounding toggle, and validation guards.
+  - `POST /api/admin/products/bulk`: Bulk availability updates, bulk active/archive toggles, bulk category moves, `BULK_PRICE_PREVIEW`, and transactional `BULK_PRICE_APPLY` with audit log entries.
+- **CSV Import / Export**:
+  - `GET /api/admin/products/export-csv`: Streams active products as CSV with rupee formatting.
+  - `GET /api/admin/products/csv-template`: Standard downloadable layout template (`products_template.csv`).
+  - `POST /api/admin/products/import-csv`: Parses with PapaParse, validates every row with Zod schema via `validateCsvRows`, robust header normalization, row-level error reporting, preview mode, and transactional upsert by SKU.
+  - `src/components/admin/CsvImportModal.tsx`: Drag-and-drop / file upload modal with error diagnostics and dry-run preview.
+- **Categories Management**:
+  - `src/components/admin/CategoriesClient.tsx`: Category cards with live gradient previews (`colorFrom` & `colorTo`), product count badges, custom slug generator, and sort order.
+  - `src/app/api/admin/categories` & `[id]`: Protected CRUD endpoints. Deletion/archiving is guarded: rejects with HTTP 400 (`CATEGORY_HAS_PRODUCTS`) if active products remain assigned to the category.
+  - `/admin/categories`: Server component loading categories and active product counts.
+- **Combos & Gift Boxes Management**:
+  - `src/components/admin/CombosClient.tsx`: Interactive bundle manager with multi-product picker, quantity steppers, live aggregate value calculation, package pricing, customer savings % badges, and archive controls.
+  - `src/app/api/admin/combos` & `[id]`: Transactional combo creation and update with product existence verification, aggregate value recalculation, and audit logging.
+  - `/admin/combos`: Server component loading existing combos and active products.
+- **Verification Gates**:
+  - `npm run typecheck`: PASSED (0 errors)
+  - `npm run lint`: PASSED (0 warnings, 0 errors)
+  - `npm run test`: PASSED (60/60 tests passing across 10 test suites, including integration tests on real PostgreSQL)
+  - `npm run build`: PASSED (33/33 static and dynamic routes compiled successfully)
+
+---
+
 ## Architectural Decisions & Observations
 1. **Integer Paise Representation**: All price fields (`mrpPaise`, `pricePaise`, `subtotalPaise`, `minOrderPaise`) strictly use integers.
 2. **PostgreSQL Database**: Configured cluster with UTF8 encoding to natively support INR symbol (`₹`) and `pg_trgm` extension.
-3. **Optimistic Locking**: Implemented via integer `version` field; verified that stale edits fail cleanly without overwriting concurrent modifications.
+3. **Optimistic Locking**: Implemented via integer `version` field; verified that stale edits fail cleanly with HTTP 409 Conflict without overwriting concurrent modifications.
 4. **Catalogue Flexibility**: Both tabular quick-order view (popular with bulk festive shoppers) and visual card view are supported with synchronized URL query parameters.
 5. **Enquiry Integrity & Privacy**: Customer tracking and estimate printouts strictly isolate customer-facing timelines while concealing internal staff notes and preventing phone enumeration attacks.
 6. **Live DB Auth Verification**: Middleware redirects unauthenticated requests, but `withAdminAuth` re-verifies `isActive` and `tokenVersion` from real PostgreSQL on every request so deactivations and password changes take immediate effect.
+7. **CSV Import Header Normalization**: Added case-insensitive and spacing-tolerant normalization in `validateCsvRows` to seamlessly support various spreadsheet headers (`SKU`, `Name`, `Price`, `Category`, etc.).
+8. **Test Serial Execution**: Configured Vitest `fileParallelism: false` so that integration test suites running real PostgreSQL transactions (gap-free counters, concurrency) do not cross-interfere.

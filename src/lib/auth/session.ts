@@ -56,7 +56,10 @@ export async function getAdminSession(): Promise<AdminSession | null> {
         mustChangePassword: user.mustChangePassword,
       },
     };
-  } catch (err) {
+  } catch (err: unknown) {
+    if (err && typeof err === "object" && "digest" in err && (err as { digest: string }).digest === "DYNAMIC_SERVER_USAGE") {
+      throw err;
+    }
     console.error("[getAdminSession] Error verifying session:", err);
     return null;
   }
@@ -94,9 +97,12 @@ export async function withAdminAuth<T>(
   } catch (err: unknown) {
     console.error("[withAdminAuth] Handler execution error:", err);
     const message = err instanceof Error ? err.message : "An unexpected server error occurred.";
+    const code = (err && typeof err === "object" && "code" in err && typeof (err as any).code === "string")
+      ? (err as any).code
+      : "SERVER_ERROR";
     return {
       ok: false,
-      code: "SERVER_ERROR",
+      code,
       message,
     };
   }

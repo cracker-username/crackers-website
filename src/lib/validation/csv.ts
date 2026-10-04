@@ -39,12 +39,33 @@ export interface ParsedCsvResult {
   errors: Array<{ rowNumber: number; sku?: string; message: string }>;
 }
 
+function normalizeRow(raw: Record<string, unknown>): Record<string, unknown> {
+  const normalized: Record<string, unknown> = {};
+  for (const [key, val] of Object.entries(raw)) {
+    const k = key.trim().toLowerCase().replace(/[\s_-]+/g, "");
+    if (k === "sku") normalized.sku = val;
+    else if (k === "name" || k === "productname") normalized.name = val;
+    else if (k === "category" || k === "categoryname") normalized.categoryName = val;
+    else if (k === "packsize") normalized.packSize = val;
+    else if (k === "unit") normalized.unit = val;
+    else if (k === "mrp" || k === "mrprupees") normalized.mrpRupees = val;
+    else if (k === "price" || k === "pricerupees") normalized.priceRupees = val;
+    else if (k === "availability") normalized.availability = val;
+    else if (k === "featured" || k === "isfeatured") normalized.isFeatured = val;
+    else if (k === "bestseller" || k === "isbestseller") normalized.isBestseller = val;
+    else if (k === "shortdesc" || k === "shortdescription" || k === "description") normalized.shortDesc = val;
+    else normalized[key] = val;
+  }
+  return normalized;
+}
+
 export function validateCsvRows(rawRows: Record<string, unknown>[]): ParsedCsvResult {
   const validRows: Array<CsvProductRow & { mrpPaise: number; pricePaise: number }> = [];
   const errors: Array<{ rowNumber: number; sku?: string; message: string }> = [];
 
-  rawRows.forEach((row, index) => {
+  rawRows.forEach((rawRow, index) => {
     const rowNumber = index + 2; // header is row 1
+    const row = normalizeRow(rawRow);
     const result = CsvProductRowSchema.safeParse(row);
 
     if (!result.success) {
