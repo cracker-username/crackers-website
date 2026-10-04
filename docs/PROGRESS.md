@@ -7,7 +7,7 @@
 - [x] **Phase 4: Enquiry engine** (COMPLETED & VERIFIED)
 - [x] **Phase 5: Admin auth and dashboard** (COMPLETED & VERIFIED)
 - [x] **Phase 6: Admin catalogue** (COMPLETED & VERIFIED)
-- [ ] **Phase 7: Admin enquiries, content and settings** (PENDING)
+- [x] **Phase 7: Admin enquiries, content and settings** (COMPLETED & VERIFIED)
 - [ ] **Phase 8: Integration, security, SEO, performance** (PENDING)
 - [ ] **Phase 9: Full QA** (PENDING)
 - [ ] **Phase 10: Final production audit** (PENDING)
@@ -185,6 +185,45 @@
 
 ---
 
+## Phase 7: Admin Enquiries, Content and Settings — Summary
+- **Enquiries Management API & UI**:
+  - `src/components/admin/EnquiryTable.tsx`: Multi-filter status tabs (`NEW`, `CONTACTED`, `CONFIRMED`, `PACKED`, `DISPATCHED`, `COMPLETED`, `CANCELLED`), real-time search, date/state filters, pagination, and responsive card collapses.
+  - `src/components/admin/EnquiryDetailDrawer.tsx`: Slide-over drawer with one-click Call and WhatsApp deep links, chronological customer timeline, line items inspection, internal staff notes feed, and full revision history.
+  - `src/app/api/admin/enquiries`: Search, status filtering, pagination, and real-time status counts.
+  - `src/app/api/admin/enquiries/export-csv`: CSV export with date formatting and rupee conversions.
+  - `src/app/api/admin/enquiries/[id]`: Full enquiry detail including items, status history, notes, and staff revisions.
+  - `src/app/api/admin/enquiries/[id]/status`: Status transition machine with role enforcement; terminal transitions (`COMPLETED`, `CANCELLED`) require `SUPER_ADMIN` with mandatory justification.
+  - `src/app/api/admin/enquiries/[id]/assign`: Staff member assignment with audit logging.
+  - `src/app/api/admin/enquiries/[id]/dispatch`: Transporter details and LR number assignment; auto-transitions to `DISPATCHED`.
+  - `src/app/api/admin/enquiries/[id]/notes`: Internal staff notes strictly hidden from customer tracking.
+  - `src/app/api/admin/enquiries/[id]/revise`: Immutable original snapshot protection. Creates versioned `EnquiryRevision` with mandatory reason, item edits, extra discounts, shipping fees, and recalculation.
+- **Content Management (CMS)**:
+  - `src/components/admin/ContentManager.tsx`: Tabbed management for Banners, FAQs, Testimonials, Legal Pages, and Homepage Sections.
+  - `src/app/api/admin/content/banners`: Promotional banners with display order, dates, and active toggles.
+  - `src/app/api/admin/content/faqs`: Accordion FAQs with category assignment, questions, answers, and sort order.
+  - `src/app/api/admin/content/testimonials`: Customer testimonials with moderation status.
+  - `src/app/api/admin/content/pages/[slug]`: In-app Markdown editor for statutory legal pages (Terms, Privacy, Delivery Policy, Safety Notice, Compliance).
+  - `src/app/api/admin/content/home-sections`: Toggle homepage sections and countdown timer configuration.
+- **Settings & Delivery Rules**:
+  - `src/components/admin/SettingsClient.tsx`: Comprehensive business profile editor (identity, phone, WhatsApp order desk, license number, address, disclaimer notes, outbox email alerts, and default SEO tags).
+  - `src/app/api/admin/settings`: Atomic settings update with cache invalidation and audit logging.
+  - `src/app/api/admin/settings/test-smtp`: Outbox notification queue verification.
+  - `src/components/admin/DeliveryRulesClient.tsx`: Multi-state delivery rule management (min order paise, shipping charges, free shipping thresholds, dispatch timeline notes, delivery warning notes) and restricted pincodes manager.
+  - `src/app/api/admin/delivery-rules` & `[id]`: Regional delivery rule CRUD.
+  - `src/app/api/admin/delivery-rules/pincodes`: Restricted pincodes blocking with reason.
+- **Staff Access, Security Audit & Outbox Notifications**:
+  - `src/components/admin/UsersClient.tsx`: Staff user creation, activation/deactivation, account unlock, and password reset.
+  - `src/app/api/admin/users` & `[id]`: User administration with password length guards and self-deactivation protection.
+  - `src/components/admin/AuditClient.tsx` & `/api/admin/audit`: Searchable audit log viewer tracking all administrative actions with actor metadata, action types, entity types, and IP addresses.
+  - `src/components/admin/NotificationsClient.tsx` & `/api/admin/notifications`: Background notification outbox inspector with retry mechanics for `FAILED` / `DEAD` events.
+- **Verification Gates**:
+  - `npm run typecheck`: PASSED (0 errors)
+  - `npm run lint`: PASSED (0 warnings, 0 errors)
+  - `npm run test`: PASSED (71/71 tests passing across 11 test suites)
+  - `npm run build`: PASSED (54/54 static and dynamic routes compiled successfully)
+
+---
+
 ## Architectural Decisions & Observations
 1. **Integer Paise Representation**: All price fields (`mrpPaise`, `pricePaise`, `subtotalPaise`, `minOrderPaise`) strictly use integers.
 2. **PostgreSQL Database**: Configured cluster with UTF8 encoding to natively support INR symbol (`₹`) and `pg_trgm` extension.
@@ -194,3 +233,5 @@
 6. **Live DB Auth Verification**: Middleware redirects unauthenticated requests, but `withAdminAuth` re-verifies `isActive` and `tokenVersion` from real PostgreSQL on every request so deactivations and password changes take immediate effect.
 7. **CSV Import Header Normalization**: Added case-insensitive and spacing-tolerant normalization in `validateCsvRows` to seamlessly support various spreadsheet headers (`SKU`, `Name`, `Price`, `Category`, etc.).
 8. **Test Serial Execution**: Configured Vitest `fileParallelism: false` so that integration test suites running real PostgreSQL transactions (gap-free counters, concurrency) do not cross-interfere.
+9. **Enquiry Revision Immutability**: The original customer submission (`originalSnapshot`) is strictly read-only and preserved permanently. All staff changes create new sequential revision records with author attribution and mandatory reason.
+10. **Role-Based Access Control**: `STAFF` users are strictly restricted to enquiries and catalogue views, preventing access to delivery rules, global system settings, staff credentials, and bulk pricing.

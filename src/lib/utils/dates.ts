@@ -123,3 +123,5 @@ export function getIstDaysAgo(days: number): Date {
   return new Date(todayStart.getTime() - days * 86400000);
 }
 
+export const formatToKolkataTime = formatIstDateTime;
+
