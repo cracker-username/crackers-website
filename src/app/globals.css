@@ -1,0 +1,95 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Dark Theme Default */
+    --background: #070418;
+    --foreground: #F6F3FF;
+    --bg-0: #070418;
+    --bg-1: #0F0A33;
+    --surface: rgba(255, 255, 255, 0.08);
+    --surface-raised: rgba(255, 255, 255, 0.12);
+    --surface-glass: rgba(15, 10, 51, 0.75);
+    --text-main: #F6F3FF;
+    --text-muted: #B9B2D9;
+    --border: rgba(255, 255, 255, 0.12);
+    --input: rgba(255, 255, 255, 0.1);
+    --ring: #FF2E93;
+
+    /* Accents */
+    --accent-magenta: #FF2E93;
+    --accent-orange: #FF7A18;
+    --accent-gold: #FFC83D;
+    --accent-cyan: #22D3EE;
+    --accent-violet: #8B5CF6;
+    --accent-lime: #A3E635;
+
+    /* Pricing Tokens (WCAG AA compliant) */
+    --price-color: #FFC83D;
+    --price-mrp: #8E87B3;
+    --price-discount: #A3E635;
+  }
+
+  .light {
+    /* Light Theme Tokens */
+    --background: #FFF9F0;
+    --foreground: #1B1038;
+    --bg-0: #FFF9F0;
+    --bg-1: #FFFFFF;
+    --surface: #FFFFFF;
+    --surface-raised: #F4EBE1;
+    --surface-glass: rgba(255, 249, 240, 0.85);
+    --text-main: #1B1038;
+    --text-muted: #6B6289;
+    --border: rgba(27, 16, 56, 0.12);
+    --input: rgba(27, 16, 56, 0.08);
+    --ring: #FF2E93;
+
+    /* Accents adjusted for light contrast */
+    --accent-magenta: #D91672;
+    --accent-orange: #E05D00;
+    --accent-gold: #B8860B; /* WCAG AA on light cream */
+    --accent-cyan: #0891B2;
+    --accent-violet: #7C3AED;
+    --accent-lime: #4D7C0F;
+
+    /* Pricing Tokens */
+    --price-color: #B8860B; /* Dark amber for high contrast */
+    --price-mrp: #8A819F;
+    --price-discount: #15803D;
+  }
+}
+
+body {
+  background-color: var(--background);
+  color: var(--text-main);
+  font-family: var(--font-poppins), sans-serif;
+  overflow-x: hidden;
+  min-height: 100vh;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-baloo), sans-serif;
+}
+
+/* Glassmorphism utility */
+.glass-panel {
+  background: var(--surface);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--border);
+}
+
+/* Reduced motion overrides */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
