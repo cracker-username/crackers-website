@@ -79,11 +79,13 @@ input:-webkit-autofill:active {
   transition: background-color 5000s ease-in-out 0s;
 }
 
+html,
 body {
+  max-width: 100%;
+  overflow-x: hidden;
   background-color: var(--background);
   color: var(--text-main);
   font-family: var(--font-poppins), sans-serif;
-  overflow-x: hidden;
   min-height: 100vh;
 }
 
