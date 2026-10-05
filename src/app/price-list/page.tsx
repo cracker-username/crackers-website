@@ -147,7 +147,7 @@ export default async function PriceListPage({ searchParams }: PriceListPageProps
   };
 
   return (
-    <div className="w-full min-h-screen py-8 md:py-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto pb-32">
+    <div className="w-full min-h-screen py-6 md:py-12 px-3 sm:px-6 lg:px-8 max-w-7xl mx-auto pb-32 overflow-x-hidden sm:overflow-x-visible">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}

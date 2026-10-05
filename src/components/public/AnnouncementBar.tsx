@@ -24,11 +24,11 @@ export function AnnouncementBar({
   return (
     <aside
       aria-label="Festival Announcement"
-      className="relative z-40 w-full overflow-hidden bg-gradient-to-r from-accent-magenta via-accent-orange to-accent-magenta text-white py-2 px-4 shadow-sm"
+      className="relative z-40 w-full max-w-full overflow-hidden bg-gradient-to-r from-accent-magenta via-accent-orange to-accent-magenta text-white py-2 px-3 sm:px-4 shadow-sm"
     >
-      <div className="max-w-7xl mx-auto flex items-center justify-between text-xs md:text-sm font-medium">
+      <div className="max-w-7xl mx-auto flex items-center justify-between text-xs md:text-sm font-medium w-full min-w-0 overflow-hidden">
         {/* Marquee Wrapper with Pause on Hover */}
-        <div className="flex-1 overflow-hidden whitespace-nowrap group">
+        <div className="flex-1 min-w-0 w-full overflow-hidden whitespace-nowrap group">
           <div className="inline-flex items-center gap-6 animate-marquee group-hover:[animation-play-state:paused]">
             <span className="inline-flex items-center gap-2">
               <Sparkles className="w-3.5 h-3.5 text-accent-gold" />
