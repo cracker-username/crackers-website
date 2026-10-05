@@ -73,129 +73,246 @@ export function PriceListFilterBar({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchInput]);
 
+  const activeFiltersCount =
+    (currentCategory ? 1 : 0) +
+    (currentAvailability ? 1 : 0) +
+    (currentFlag ? 1 : 0) +
+    (currentQuery ? 1 : 0);
+
   return (
     <div className="w-full space-y-4">
-      {/* Top Row: Search Input + Sorting + View Toggles + Mobile Filter Button */}
-      <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
-        {/* Search Bar */}
-        <div className="relative flex-1">
-          <Search className="w-4 h-4 text-accent-magenta absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+      {/* ============================================================== */}
+      {/* 1. STICKY MOBILE CONTROLS (< 768px) — STAYS ACCESSIBLE ON SCROLL */}
+      {/* ============================================================== */}
+      <div className="md:hidden sticky top-16 z-20 bg-bg-0/95 backdrop-blur-md pt-2 pb-2.5 px-3 sm:px-4 -mx-4 sm:mx-0 border-b border-white/10 shadow-lg space-y-2">
+        {/* Row 1: Mobile Search Input */}
+        <div className="relative w-full">
+          <Search className="w-4 h-4 text-accent-magenta absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
           <input
             type="text"
             value={searchInput}
             onChange={(e) => setSearchInput(e.target.value)}
-            placeholder="Search crackers, SKU (e.g. FP-01) or description..."
-            className="w-full pl-10 pr-9 py-2.5 rounded-xl bg-white/5 border border-white/10 text-sm text-foreground placeholder:text-text-muted/60 focus:outline-none focus:ring-2 focus:ring-accent-magenta transition-all"
+            placeholder="Search products or SKU..."
+            className="w-full pl-9 pr-8 py-2 rounded-xl bg-white/10 border border-white/15 text-xs text-foreground placeholder:text-text-muted/60 focus:outline-none focus:ring-1 focus:ring-accent-magenta"
           />
           {searchInput && (
             <button
               onClick={() => setSearchInput("")}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-text-muted hover:text-foreground"
+              className="absolute right-2.5 top-1/2 -translate-y-1/2 text-text-muted hover:text-foreground p-0.5"
               aria-label="Clear Search Input"
             >
-              <X className="w-4 h-4" />
+              <X className="w-3.5 h-3.5" />
             </button>
           )}
         </div>
 
-        {/* Right Controls: Sort & Views */}
-        <div className="flex items-center gap-2 self-end md:self-auto w-full md:w-auto justify-between md:justify-end">
-          {/* Sorting Dropdown */}
+        {/* Row 2: Filter Button + Sort Dropdown */}
+        <div className="flex items-center gap-2">
+          {/* Filter Drawer Trigger */}
+          <button
+            onClick={() => setFilterDrawerOpen(true)}
+            type="button"
+            className={`flex-1 min-h-[38px] px-3 py-1.5 rounded-xl border text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors ${
+              activeFiltersCount > 0
+                ? "bg-accent-magenta/20 border-accent-magenta text-accent-gold"
+                : "bg-white/5 border-white/10 text-text-muted hover:text-foreground"
+            }`}
+          >
+            <SlidersHorizontal className="w-3.5 h-3.5" />
+            <span>Filters {activeFiltersCount > 0 ? `(${activeFiltersCount})` : ""}</span>
+          </button>
+
+          {/* Sort Dropdown */}
           <select
             value={currentSort}
             onChange={(e) => updateQueryParam({ sort: e.target.value })}
-            className="px-3 py-2.5 rounded-xl bg-white/5 border border-white/10 text-xs md:text-sm text-foreground font-semibold focus:outline-none focus:ring-2 focus:ring-accent-magenta"
+            className="flex-1 min-h-[38px] px-3 py-1.5 rounded-xl bg-white/5 border border-white/10 text-xs text-foreground font-semibold focus:outline-none focus:ring-1 focus:ring-accent-magenta"
             aria-label="Sort Crackers"
           >
-            <option value="featured" className="bg-bg-1">Featured</option>
-            <option value="popular" className="bg-bg-1">Popular (Bestseller)</option>
-            <option value="newest" className="bg-bg-1">New Arrivals</option>
+            <option value="featured" className="bg-bg-1">Sort: Featured</option>
+            <option value="popular" className="bg-bg-1">Sort: Popular</option>
+            <option value="newest" className="bg-bg-1">Sort: Newest</option>
             <option value="price_asc" className="bg-bg-1">Price: Low to High</option>
             <option value="price_desc" className="bg-bg-1">Price: High to Low</option>
             <option value="discount_desc" className="bg-bg-1">Highest Discount</option>
           </select>
 
-          {/* View Toggles (Cards vs Quick Order Table) */}
-          <div className="inline-flex rounded-xl bg-white/5 border border-white/10 p-1">
+          {/* Reset Filters shortcut */}
+          {activeFiltersCount > 0 && (
             <button
-              onClick={() => {
-                updateQueryParam({ view: "cards" });
-                onViewChange?.("cards");
-              }}
-              className={`p-2 rounded-lg transition-colors ${
-                viewMode === "cards"
-                  ? "bg-accent-magenta text-white shadow-sm"
-                  : "text-text-muted hover:text-foreground"
-              }`}
-              aria-label="Card View"
-              title="Card View"
+              onClick={() =>
+                updateQueryParam({
+                  category: null,
+                  q: null,
+                  availability: null,
+                  flag: null,
+                })
+              }
+              type="button"
+              className="min-h-[38px] px-2.5 py-1.5 rounded-xl bg-rose-500/15 border border-rose-500/30 text-rose-300 text-[11px] font-bold"
+              title="Reset all filters"
             >
-              <LayoutGrid className="w-4 h-4" />
+              Reset
             </button>
-            <button
-              onClick={() => {
-                updateQueryParam({ view: "table" });
-                onViewChange?.("table");
-              }}
-              className={`p-2 rounded-lg transition-colors ${
-                viewMode === "table"
-                  ? "bg-accent-magenta text-white shadow-sm"
-                  : "text-text-muted hover:text-foreground"
-              }`}
-              aria-label="Quick Order Table View"
-              title="Quick Order Table"
-            >
-              <List className="w-4 h-4" />
-            </button>
-          </div>
+          )}
+        </div>
 
-          {/* Mobile Filter Drawer Button */}
-          <button
-            onClick={() => setFilterDrawerOpen(true)}
-            className="md:hidden flex items-center gap-1.5 px-3 py-2 rounded-xl bg-white/5 border border-white/10 text-xs font-semibold text-text-muted hover:text-foreground"
-          >
-            <SlidersHorizontal className="w-3.5 h-3.5" />
-            <span>Filters</span>
-          </button>
+        {/* Row 3: Controlled Mobile Category Chip Rail (No body scroll) */}
+        <div className="overflow-x-auto pb-0.5 scrollbar-none w-full">
+          <div className="flex items-center gap-1.5 min-w-max">
+            <button
+              onClick={() => updateQueryParam({ category: null })}
+              className={`px-3 py-1 rounded-full text-[11px] font-semibold transition-all ${
+                !currentCategory
+                  ? "bg-accent-gold text-bg-0 shadow-sm font-bold"
+                  : "bg-white/5 text-text-muted hover:text-foreground border border-white/10"
+              }`}
+            >
+              All ({totalCount})
+            </button>
+            {categories.map((cat) => {
+              const isSelected = currentCategory === cat.slug;
+              return (
+                <button
+                  key={cat.id}
+                  onClick={() => updateQueryParam({ category: cat.slug })}
+                  className={`px-3 py-1 rounded-full text-[11px] font-semibold transition-all flex items-center gap-1.5 ${
+                    isSelected
+                      ? "text-white font-bold shadow-sm"
+                      : "bg-white/5 text-text-muted hover:text-foreground border border-white/10"
+                  }`}
+                  style={
+                    isSelected
+                      ? {
+                          background: `linear-gradient(135deg, ${cat.colorFrom}, ${cat.colorTo})`,
+                        }
+                      : {}
+                  }
+                >
+                  <span>{cat.name}</span>
+                </button>
+              );
+            })}
+          </div>
         </div>
       </div>
 
-      {/* Category Chips Bar (Mobile Horizontal Scroll / Desktop Rail) */}
-      <div className="overflow-x-auto pb-1 scrollbar-none">
-        <div className="flex items-center gap-2 min-w-max">
-          <button
-            onClick={() => updateQueryParam({ category: null })}
-            className={`px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all ${
-              !currentCategory
-                ? "bg-accent-gold text-bg-0 shadow-md font-bold"
-                : "bg-white/5 text-text-muted hover:text-foreground border border-white/10"
-            }`}
-          >
-            All Products ({totalCount})
-          </button>
-          {categories.map((cat) => {
-            const isSelected = currentCategory === cat.slug;
-            return (
+      {/* ============================================================== */}
+      {/* 2. DESKTOP FILTER CONTROLS (>= 768px) — PRESERVED ORIGINAL      */}
+      {/* ============================================================== */}
+      <div className="hidden md:flex flex-col gap-4">
+        <div className="flex items-center justify-between gap-3">
+          {/* Search Bar */}
+          <div className="relative flex-1">
+            <Search className="w-4 h-4 text-accent-magenta absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+            <input
+              type="text"
+              value={searchInput}
+              onChange={(e) => setSearchInput(e.target.value)}
+              placeholder="Search crackers, SKU (e.g. FP-01) or description..."
+              className="w-full pl-10 pr-9 py-2.5 rounded-xl bg-white/5 border border-white/10 text-sm text-foreground placeholder:text-text-muted/60 focus:outline-none focus:ring-2 focus:ring-accent-magenta transition-all"
+            />
+            {searchInput && (
               <button
-                key={cat.id}
-                onClick={() => updateQueryParam({ category: cat.slug })}
-                className={`px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all flex items-center gap-1.5 ${
-                  isSelected
-                    ? "text-white font-bold shadow-md"
-                    : "bg-white/5 text-text-muted hover:text-foreground border border-white/10"
-                }`}
-                style={
-                  isSelected
-                    ? {
-                        background: `linear-gradient(135deg, ${cat.colorFrom}, ${cat.colorTo})`,
-                      }
-                    : {}
-                }
+                onClick={() => setSearchInput("")}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-text-muted hover:text-foreground"
+                aria-label="Clear Search Input"
               >
-                <span>{cat.name}</span>
+                <X className="w-4 h-4" />
               </button>
-            );
-          })}
+            )}
+          </div>
+
+          {/* Right Controls: Sort & Views */}
+          <div className="flex items-center gap-2">
+            {/* Sorting Dropdown */}
+            <select
+              value={currentSort}
+              onChange={(e) => updateQueryParam({ sort: e.target.value })}
+              className="px-3 py-2.5 rounded-xl bg-white/5 border border-white/10 text-xs md:text-sm text-foreground font-semibold focus:outline-none focus:ring-2 focus:ring-accent-magenta"
+              aria-label="Sort Crackers"
+            >
+              <option value="featured" className="bg-bg-1">Featured</option>
+              <option value="popular" className="bg-bg-1">Popular (Bestseller)</option>
+              <option value="newest" className="bg-bg-1">New Arrivals</option>
+              <option value="price_asc" className="bg-bg-1">Price: Low to High</option>
+              <option value="price_desc" className="bg-bg-1">Price: High to Low</option>
+              <option value="discount_desc" className="bg-bg-1">Highest Discount</option>
+            </select>
+
+            {/* View Toggles (Cards vs Quick Order Table) */}
+            <div className="inline-flex rounded-xl bg-white/5 border border-white/10 p-1">
+              <button
+                onClick={() => {
+                  updateQueryParam({ view: "cards" });
+                  onViewChange?.("cards");
+                }}
+                className={`p-2 rounded-lg transition-colors ${
+                  viewMode === "cards"
+                    ? "bg-accent-magenta text-white shadow-sm"
+                    : "text-text-muted hover:text-foreground"
+                }`}
+                aria-label="Card View"
+                title="Card View"
+              >
+                <LayoutGrid className="w-4 h-4" />
+              </button>
+              <button
+                onClick={() => {
+                  updateQueryParam({ view: "table" });
+                  onViewChange?.("table");
+                }}
+                className={`p-2 rounded-lg transition-colors ${
+                  viewMode === "table"
+                    ? "bg-accent-magenta text-white shadow-sm"
+                    : "text-text-muted hover:text-foreground"
+                }`}
+                aria-label="Quick Order Table View"
+                title="Quick Order Table"
+              >
+                <List className="w-4 h-4" />
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Category Chips Bar for Desktop */}
+        <div className="overflow-x-auto pb-1 scrollbar-none">
+          <div className="flex items-center gap-2 min-w-max">
+            <button
+              onClick={() => updateQueryParam({ category: null })}
+              className={`px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all ${
+                !currentCategory
+                  ? "bg-accent-gold text-bg-0 shadow-md font-bold"
+                  : "bg-white/5 text-text-muted hover:text-foreground border border-white/10"
+              }`}
+            >
+              All Products ({totalCount})
+            </button>
+            {categories.map((cat) => {
+              const isSelected = currentCategory === cat.slug;
+              return (
+                <button
+                  key={cat.id}
+                  onClick={() => updateQueryParam({ category: cat.slug })}
+                  className={`px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all flex items-center gap-1.5 ${
+                    isSelected
+                      ? "text-white font-bold shadow-md"
+                      : "bg-white/5 text-text-muted hover:text-foreground border border-white/10"
+                  }`}
+                  style={
+                    isSelected
+                      ? {
+                          background: `linear-gradient(135deg, ${cat.colorFrom}, ${cat.colorTo})`,
+                        }
+                      : {}
+                  }
+                >
+                  <span>{cat.name}</span>
+                </button>
+              );
+            })}
+          </div>
         </div>
       </div>
 

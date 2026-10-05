@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Plus, Minus, Eye, ShoppingBag } from "lucide-react";
+import { Plus, Minus, Eye, ShoppingBag, Check } from "lucide-react";
 import { formatPaise, calculateDiscountPercent } from "@/lib/utils/money";
 import { useCartStore } from "@/store/useCartStore";
 import { Badge } from "../ui/Badge";
@@ -45,6 +45,7 @@ export function ProductCard({
   const [qty, setQty] = useState(1);
   const [activeSpark, setActiveSpark] = useState(false);
   const [isQuickViewOpen, setIsQuickViewOpen] = useState(false);
+  const [isAdded, setIsAdded] = useState(false);
 
   const addItem = useCartStore((state) => state.addItem);
   const triggerSpark = useCartStore((state) => state.triggerSpark);
@@ -74,7 +75,9 @@ export function ProductCard({
     );
     triggerSpark(product.id);
     setActiveSpark(true);
+    setIsAdded(true);
     setTimeout(() => setActiveSpark(false), 600);
+    setTimeout(() => setIsAdded(false), 1400);
   };
 
   return (
@@ -196,25 +199,25 @@ export function ProductCard({
 
           {/* Action Row: Quantity Stepper & Add to Enquiry */}
           <div className="flex items-center gap-2 pt-2 border-t border-white/5">
-            {/* Quantity Stepper */}
-            <div className="inline-flex items-center rounded-xl bg-white/5 border border-white/10 shrink-0">
+            {/* Quantity Stepper: min 44px touch targets */}
+            <div className="inline-flex items-center rounded-xl bg-white/10 border border-white/10 shrink-0">
               <button
                 onClick={() => setQty(Math.max(1, qty - 1))}
                 disabled={!isAvailable}
                 type="button"
-                className="p-1.5 text-text-muted hover:text-foreground disabled:opacity-40 transition-colors"
+                className="min-h-[44px] min-w-[38px] flex items-center justify-center text-text-muted hover:text-accent-gold disabled:opacity-40 transition-colors"
                 aria-label="Decrease quantity"
               >
                 <Minus className="w-3.5 h-3.5" />
               </button>
-              <span className="w-6 text-center text-xs font-bold text-foreground">
+              <span className="w-7 text-center text-xs font-bold text-foreground">
                 {qty}
               </span>
               <button
                 onClick={() => setQty(qty + 1)}
                 disabled={!isAvailable}
                 type="button"
-                className="p-1.5 text-text-muted hover:text-foreground disabled:opacity-40 transition-colors"
+                className="min-h-[44px] min-w-[38px] flex items-center justify-center text-text-muted hover:text-accent-gold disabled:opacity-40 transition-colors"
                 aria-label="Increase quantity"
               >
                 <Plus className="w-3.5 h-3.5" />
@@ -226,11 +229,24 @@ export function ProductCard({
               onClick={handleAdd}
               disabled={!isAvailable}
               type="button"
-              className="flex-1 min-h-[40px] px-3 py-1.5 rounded-xl bg-gradient-to-r from-accent-magenta to-accent-orange hover:brightness-110 active:scale-[0.98] text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow-md shadow-accent-magenta/20 transition-all disabled:opacity-50 disabled:pointer-events-none"
+              className={`flex-1 min-h-[44px] px-3 py-1.5 rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 shadow-md transition-all active:scale-[0.98] disabled:opacity-50 disabled:pointer-events-none ${
+                isAdded
+                  ? "bg-emerald-600 text-white ring-2 ring-emerald-400"
+                  : "bg-gradient-to-r from-accent-magenta to-accent-orange hover:brightness-110 text-white shadow-accent-magenta/20"
+              }`}
               aria-label={`Add ${product.name} to enquiry`}
             >
-              <ShoppingBag className="w-3.5 h-3.5" />
-              <span>Add to Enquiry</span>
+              {isAdded ? (
+                <>
+                  <Check className="w-4 h-4 text-white" />
+                  <span>Added</span>
+                </>
+              ) : (
+                <>
+                  <ShoppingBag className="w-3.5 h-3.5" />
+                  <span>Add to Enquiry</span>
+                </>
+              )}
             </button>
           </div>
         </div>

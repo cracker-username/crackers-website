@@ -33,46 +33,47 @@ export function StickyEnquiryBar() {
   return (
     <aside
       aria-label="Enquiry Cart Progress Bar"
-      className="fixed bottom-[56px] lg:bottom-0 left-0 right-0 z-30 bg-bg-1/95 backdrop-blur-md border-t border-white/10 shadow-2xl py-2.5 px-4 animate-slideUp"
+      className="fixed z-30 bg-bg-1/95 backdrop-blur-md border-t border-white/10 shadow-2xl py-2 px-3 sm:py-2.5 sm:px-4 animate-slideUp left-0 right-0 bottom-[56px] lg:bottom-0"
+      style={{
+        bottom: "calc(56px + env(safe-area-inset-bottom, 0px))",
+      }}
     >
-      <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
+      <div className="max-w-7xl mx-auto flex items-center justify-between gap-2.5 sm:gap-4">
         {/* Progress & Subtotal */}
-        <div className="flex items-center gap-4 w-full sm:w-auto justify-between sm:justify-start">
-          <div>
-            <div className="flex items-center gap-2">
-              <span className="text-xs text-text-muted">
-                {totalItems} {totalItems === 1 ? "item" : "items"} • Subtotal:
+        <div className="min-w-0 flex-1">
+          <div className="flex items-baseline gap-1.5 flex-wrap">
+            <span className="text-[11px] sm:text-xs text-text-muted font-medium">
+              {totalItems} {totalItems === 1 ? "Item" : "Items"} •
+            </span>
+            <span className="font-heading font-extrabold text-sm sm:text-base text-accent-gold">
+              {formatPaise(subtotalPaise)}
+            </span>
+          </div>
+          <div className="text-[10px] sm:text-[11px] leading-tight truncate">
+            {isMinMet ? (
+              <span className="text-emerald-400 font-bold inline-flex items-center gap-1">
+                <CheckCircle2 className="w-3 h-3 shrink-0" />
+                <span>✓ Minimum requirement reached</span>
               </span>
-              <span className="font-heading font-extrabold text-base md:text-lg text-accent-gold">
-                {formatPaise(subtotalPaise)}
+            ) : (
+              <span className="text-amber-300 font-medium inline-flex items-center gap-1">
+                <AlertCircle className="w-3 h-3 shrink-0" />
+                <span>{formatPaise(shortfallPaise)} more needed</span>
               </span>
-            </div>
-            <div className="flex items-center gap-1.5 text-[11px]">
-              {isMinMet ? (
-                <span className="text-emerald-400 font-bold inline-flex items-center gap-1">
-                  <CheckCircle2 className="w-3.5 h-3.5" />
-                  Min. enquiry requirement reached for {selectedState}!
-                </span>
-              ) : (
-                <span className="text-amber-300 font-medium inline-flex items-center gap-1">
-                  <AlertCircle className="w-3.5 h-3.5" />
-                  Add {formatPaise(shortfallPaise)} more to reach {selectedState} minimum
-                </span>
-              )}
-            </div>
+            )}
           </div>
         </div>
 
         {/* Action Button */}
-        <div className="w-full sm:w-auto flex items-center justify-end">
-          <Link href="/enquiry" className="w-full sm:w-auto">
+        <div className="shrink-0">
+          <Link href="/enquiry">
             <Button
               variant={isMinMet ? "primary" : "secondary"}
-              size="md"
-              className="w-full sm:w-auto font-bold flex items-center justify-center gap-2"
+              size="sm"
+              className="min-h-[40px] px-3 sm:px-4 font-bold flex items-center gap-1.5 text-xs sm:text-sm whitespace-nowrap shadow-md"
             >
               <span>Review Enquiry</span>
-              <ArrowRight className="w-4 h-4" />
+              <ArrowRight className="w-3.5 h-3.5" />
             </Button>
           </Link>
         </div>

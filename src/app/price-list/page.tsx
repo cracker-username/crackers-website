@@ -185,18 +185,18 @@ export default async function PriceListPage({ searchParams }: PriceListPageProps
       </div>
 
       {/* Active Results Summary */}
-      <div className="flex items-center justify-between text-xs text-text-muted mb-6">
+      <div className="flex items-center justify-between text-xs text-text-muted mb-6 flex-wrap gap-2">
         <span>
           Showing <strong>{formattedProducts.length}</strong> {formattedProducts.length === 1 ? "cracker" : "crackers"}
           {categorySlug && ` in ${categorySlug.replace(/-/g, " ")}`}
         </span>
         <div className="flex items-center gap-1.5 text-accent-gold">
           <FileSpreadsheet className="w-3.5 h-3.5" />
-          <span>Quick order table view available</span>
+          <span>Direct Sivakasi Factory Estimates</span>
         </div>
       </div>
 
-      {/* Main Listing View (Cards vs Table) */}
+      {/* Main Listing View (Responsive Mobile Cards + Desktop Table/Grid) */}
       {formattedProducts.length === 0 ? (
         <div className="p-12 text-center rounded-3xl bg-bg-1 border border-white/10 my-8">
           <h3 className="font-heading font-bold text-xl text-foreground mb-2">
@@ -207,15 +207,25 @@ export default async function PriceListPage({ searchParams }: PriceListPageProps
           </p>
         </div>
       ) : viewMode === "cards" ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
-          {formattedProducts.map((product) => (
-            <ProductCard
-              key={product.id}
-              product={product}
+        <>
+          {/* Mobile View (< 768px): Dedicated full-width compact cards (Zero horizontal scroll) */}
+          <div className="block md:hidden">
+            <QuickOrderTable
+              products={formattedProducts}
               showMrpAndDiscount={showMrpAndDiscount}
             />
-          ))}
-        </div>
+          </div>
+          {/* Desktop/Tablet Grid View (>= 768px): Rich visual cards */}
+          <div className="hidden md:grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
+            {formattedProducts.map((product) => (
+              <ProductCard
+                key={product.id}
+                product={product}
+                showMrpAndDiscount={showMrpAndDiscount}
+              />
+            ))}
+          </div>
+        </>
       ) : (
         <QuickOrderTable
           products={formattedProducts}
