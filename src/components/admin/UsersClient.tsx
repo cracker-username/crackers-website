@@ -361,7 +361,7 @@ export function UsersClient({ initialUsers, currentUserId }: UsersClientProps) {
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="e.g. ramesh@crackers.local"
+                  placeholder="e.g. ramesh@festivofireworks.com"
                   className="w-full bg-brand-bg-0 border border-white/10 rounded-xl px-3 py-2 text-white"
                 />
               </div>

@@ -1,9 +1,10 @@
 import React from "react";
 import { Metadata } from "next";
 import { ShieldAlert, CheckCircle, XCircle, Flame, Droplets } from "lucide-react";
+import { DEFAULT_SITE_CONFIG } from "@/lib/settings/siteConfig";
 
 export const metadata: Metadata = {
-  title: "Fireworks Safety Guidelines — Sivakasi Sparklers",
+  title: `Fireworks Safety Guidelines — ${DEFAULT_SITE_CONFIG.name}`,
   description:
     "Crucial safety precautions, lighting dos and don'ts, and emergency guidelines for a safe festival celebration.",
 };

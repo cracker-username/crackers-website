@@ -4,9 +4,10 @@ import { prisma } from "@/lib/db/prisma";
 import { HelpCircle, ChevronDown } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/Button";
+import { DEFAULT_SITE_CONFIG } from "@/lib/settings/siteConfig";
 
 export const metadata: Metadata = {
-  title: "Frequently Asked Questions — Sivakasi Sparklers",
+  title: `Frequently Asked Questions — ${DEFAULT_SITE_CONFIG.name}`,
   description:
     "Common questions about fireworks enquiry submission, minimum order values, surface cargo delivery, and safety compliance.",
 };

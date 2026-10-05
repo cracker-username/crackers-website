@@ -1,9 +1,10 @@
 import React from "react";
 import type { Metadata } from "next";
 import { EnquiryForm } from "@/components/public/EnquiryForm";
+import { DEFAULT_SITE_CONFIG } from "@/lib/settings/siteConfig";
 
 export const metadata: Metadata = {
-  title: "Review Enquiry & Estimate — Sivakasi Sparklers",
+  title: `Review Enquiry & Estimate — ${DEFAULT_SITE_CONFIG.name}`,
   description: "Review your selected festival fireworks, check minimum order requirements, and submit your direct factory enquiry.",
 };
 

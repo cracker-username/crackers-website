@@ -6,8 +6,9 @@ import { prisma } from "@/lib/db/prisma";
 import { parseSettingValue } from "@/lib/settings/registry";
 import { ProductDetailClient } from "@/components/public/ProductDetailClient";
 import { ProductCard } from "@/components/public/ProductCard";
-import { StickyEnquiryBar } from "@/components/public/StickyEnquiryBar";
 import { ChevronRight, ShieldCheck, HelpCircle } from "lucide-react";
+
+import { DEFAULT_SITE_CONFIG } from "@/lib/settings/siteConfig";
 
 interface ProductPageProps {
   params: Promise<{ slug: string }>;
@@ -24,8 +25,8 @@ export async function generateMetadata({
   if (!product) return { title: "Product Not Found" };
 
   return {
-    title: `${product.name} (${product.sku}) — Sivakasi Price List`,
-    description: product.shortDesc || `Enquire about ${product.name} from Sivakasi Sparklers. Authentic Sivakasi manufacturing.`,
+    title: `${product.name} (${product.sku}) — ${DEFAULT_SITE_CONFIG.name}`,
+    description: product.shortDesc || `Enquire about ${product.name} from ${DEFAULT_SITE_CONFIG.name}. Authentic Sivakasi manufacturing.`,
   };
 }
 
@@ -60,19 +61,32 @@ export default async function ProductPage({ params }: ProductPageProps) {
   });
 
   // Settings for direct phone/whatsapp enquiry
-  let phone = "+91 98765 43210";
-  let whatsappNumber = "919876543210";
-  let brandName = "Sivakasi Sparklers";
+  let phone = DEFAULT_SITE_CONFIG.phone;
+  let whatsappNumber = DEFAULT_SITE_CONFIG.whatsappNumber;
+  let brandName = DEFAULT_SITE_CONFIG.name;
 
   try {
     const settings = await prisma.setting.findMany();
     const map = new Map(settings.map((s) => [s.key, s.value]));
-    if (map.has("phone")) phone = parseSettingValue("phone", map.get("phone"));
-    if (map.has("whatsappNumber")) whatsappNumber = parseSettingValue("whatsappNumber", map.get("whatsappNumber"));
-    if (map.has("businessName")) brandName = parseSettingValue("businessName", map.get("businessName"));
+    if (map.has("phone")) {
+      const val = parseSettingValue("phone", map.get("phone"));
+      if (val && !val.includes("98765")) phone = val;
+    }
+    if (map.has("whatsappNumber")) {
+      const val = parseSettingValue("whatsappNumber", map.get("whatsappNumber"));
+      if (val && !val.includes("98765")) whatsappNumber = val;
+    }
+    if (map.has("businessName")) {
+      const val = parseSettingValue("businessName", map.get("businessName"));
+      if (val && val !== "[BRAND_NAME]") brandName = val;
+    }
   } catch (e) {
     console.warn("Failed to load settings in ProductPage:", e);
   }
+
+  const safeProductBrand = (!product.brand || product.brand === "[BRAND_NAME]" || product.brand === "Sivakasi Sparklers")
+    ? brandName
+    : product.brand;
 
   const specs = Array.isArray(product.specifications)
     ? (product.specifications as Array<{ label: string; value: string }>)
@@ -80,10 +94,10 @@ export default async function ProductPage({ params }: ProductPageProps) {
         { label: "Origin", value: "Sivakasi, Tamil Nadu" },
         { label: "Pack Size", value: product.packSize },
         { label: "Unit", value: product.unit },
-        { label: "Manufacturer Brand", value: product.brand || "[BRAND_NAME]" },
+        { label: "Manufacturer Brand", value: safeProductBrand },
       ];
 
-  const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL || "https://crackers.local").replace(/\/$/, "");
+  const siteUrl = (process.env.NEXT_PUBLIC_APP_URL || process.env.NEXT_PUBLIC_SITE_URL || DEFAULT_SITE_CONFIG.siteUrl).replace(/\/$/, "");
 
   const breadcrumbJsonLd = {
     "@context": "https://schema.org",
@@ -269,9 +283,6 @@ export default async function ProductPage({ params }: ProductPageProps) {
           </div>
         </section>
       )}
-
-      {/* Sticky Bottom Enquiry Bar */}
-      <StickyEnquiryBar />
     </div>
   );
 }

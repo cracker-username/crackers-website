@@ -4,8 +4,8 @@ import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { prisma } from "@/lib/db/prisma";
 import { ProductCard } from "@/components/public/ProductCard";
-import { StickyEnquiryBar } from "@/components/public/StickyEnquiryBar";
 import { ChevronRight, ArrowLeft } from "lucide-react";
+import { DEFAULT_SITE_CONFIG } from "@/lib/settings/siteConfig";
 
 interface CollectionPageProps {
   params: Promise<{ slug: string }>;
@@ -19,8 +19,8 @@ export async function generateMetadata({
   if (!category) return { title: "Collection Not Found" };
 
   return {
-    title: `${category.name} Price List 2026 — Sivakasi Sparklers`,
-    description: category.description || `Browse authentic Sivakasi ${category.name} with direct factory estimates.`,
+    title: `${category.name} Price List 2026 — ${DEFAULT_SITE_CONFIG.name}`,
+    description: category.description || `Browse authentic Sivakasi ${category.name} with direct factory estimates from ${DEFAULT_SITE_CONFIG.name}.`,
   };
 }
 
@@ -70,7 +70,7 @@ export default async function CollectionPage({ params }: CollectionPageProps) {
     images: p.images.map((img) => ({ url: img.url, altText: img.altText })),
   }));
 
-  const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL || "https://crackers.local").replace(/\/$/, "");
+  const siteUrl = (process.env.NEXT_PUBLIC_APP_URL || process.env.NEXT_PUBLIC_SITE_URL || DEFAULT_SITE_CONFIG.siteUrl).replace(/\/$/, "");
 
   const breadcrumbJsonLd = {
     "@context": "https://schema.org",
@@ -142,9 +142,6 @@ export default async function CollectionPage({ params }: CollectionPageProps) {
           <ProductCard key={product.id} product={product} />
         ))}
       </div>
-
-      {/* Sticky Bottom Bar */}
-      <StickyEnquiryBar />
     </div>
   );
 }

@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Plus, Minus, ShoppingBag } from "lucide-react";
+import { Plus, Minus, ShoppingBag, Check } from "lucide-react";
 import { formatPaise, calculateDiscountPercent } from "@/lib/utils/money";
 import { useCartStore } from "@/store/useCartStore";
 import { ProductCardData } from "./ProductCard";
@@ -21,6 +21,7 @@ export function QuickOrderTable({
 }: QuickOrderTableProps) {
   const [quantities, setQuantities] = useState<Record<string, number>>({});
   const [sparkId, setSparkId] = useState<string | null>(null);
+  const [addedId, setAddedId] = useState<string | null>(null);
 
   const addItem = useCartStore((state) => state.addItem);
   const triggerSpark = useCartStore((state) => state.triggerSpark);
@@ -58,7 +59,9 @@ export function QuickOrderTable({
 
     triggerSpark(product.id);
     setSparkId(product.id);
+    setAddedId(product.id);
     setTimeout(() => setSparkId(null), 600);
+    setTimeout(() => setAddedId(null), 1200);
   };
 
   return (
@@ -180,22 +183,22 @@ export function QuickOrderTable({
                           onClick={() => setQty(p.id, qty - 1)}
                           disabled={!isAvailable}
                           type="button"
-                          className="p-1.5 hover:text-accent-gold disabled:opacity-30 transition-colors"
+                          className="min-h-[40px] min-w-[36px] flex items-center justify-center hover:text-accent-gold disabled:opacity-30 transition-colors"
                           aria-label={`Decrease ${p.name} quantity`}
                         >
-                          <Minus className="w-3 h-3" />
+                          <Minus className="w-3.5 h-3.5" />
                         </button>
-                        <span className="w-7 text-center font-bold text-xs">
+                        <span className="w-8 text-center font-bold text-xs">
                           {qty}
                         </span>
                         <button
                           onClick={() => setQty(p.id, qty + 1)}
                           disabled={!isAvailable}
                           type="button"
-                          className="p-1.5 hover:text-accent-gold disabled:opacity-30 transition-colors"
+                          className="min-h-[40px] min-w-[36px] flex items-center justify-center hover:text-accent-gold disabled:opacity-30 transition-colors"
                           aria-label={`Increase ${p.name} quantity`}
                         >
-                          <Plus className="w-3 h-3" />
+                          <Plus className="w-3.5 h-3.5" />
                         </button>
                       </div>
 
@@ -203,11 +206,19 @@ export function QuickOrderTable({
                         onClick={() => handleAdd(p)}
                         disabled={!isAvailable}
                         type="button"
-                        className="p-2 rounded-lg bg-gradient-to-r from-accent-magenta to-accent-orange hover:brightness-110 active:scale-95 text-white font-bold text-xs disabled:opacity-40 transition-all shadow-md"
+                        className={`min-h-[40px] min-w-[40px] p-2 rounded-lg flex items-center justify-center font-bold text-xs disabled:opacity-40 transition-all shadow-md active:scale-95 ${
+                          addedId === p.id
+                            ? "bg-emerald-600 text-white ring-2 ring-emerald-400"
+                            : "bg-gradient-to-r from-accent-magenta to-accent-orange hover:brightness-110 text-white"
+                        }`}
                         aria-label={`Add ${qty} of ${p.name} to enquiry`}
-                        title="Add to enquiry"
+                        title={addedId === p.id ? "Added to enquiry!" : "Add to enquiry"}
                       >
-                        <ShoppingBag className="w-4 h-4" />
+                        {addedId === p.id ? (
+                          <Check className="w-4 h-4 text-white" />
+                        ) : (
+                          <ShoppingBag className="w-4 h-4" />
+                        )}
                       </button>
                     </div>
                   </td>

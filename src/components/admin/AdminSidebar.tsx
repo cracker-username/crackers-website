@@ -22,6 +22,7 @@ import {
 } from "lucide-react";
 import { Role } from "@prisma/client";
 import { ChangePasswordModal } from "./ChangePasswordModal";
+import { DEFAULT_SITE_CONFIG } from "@/lib/settings/siteConfig";
 
 interface AdminSidebarProps {
   user: {
@@ -130,11 +131,11 @@ export function AdminSidebar({ user }: AdminSidebarProps) {
         {/* Brand / Logo */}
         <div className="p-6 border-b border-border flex items-center gap-3">
           <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-accent-magenta to-accent-orange flex items-center justify-center text-white font-bold text-sm shadow-md">
-            SS
+            FF
           </div>
           <div>
             <h2 className="font-heading font-black text-sm text-text leading-tight">
-              Sivakasi Sparklers
+              {DEFAULT_SITE_CONFIG.name}
             </h2>
             <p className="text-[10px] text-muted font-semibold uppercase tracking-wider">
               Operations Desk

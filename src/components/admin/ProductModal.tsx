@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import { rupeesToPaise, calculateDiscountPercent } from "@/lib/utils/money";
 import { Button } from "@/components/ui/Button";
 import { X, AlertCircle, Loader2 } from "lucide-react";
+import { DEFAULT_SITE_CONFIG } from "@/lib/settings/siteConfig";
 
 interface ProductModalProps {
   isOpen: boolean;
@@ -25,7 +26,7 @@ export function ProductModal({
   const [sku, setSku] = useState("");
   const [name, setName] = useState("");
   const [categoryId, setCategoryId] = useState("");
-  const [brand, setBrand] = useState("Sivakasi Sparklers");
+  const [brand, setBrand] = useState(DEFAULT_SITE_CONFIG.name);
   const [packSize, setPackSize] = useState("1 Box");
   const [unit, setUnit] = useState("Box");
   const [mrpRupees, setMrpRupees] = useState("");
@@ -50,7 +51,7 @@ export function ProductModal({
       setSku(product.sku || "");
       setName(product.name || "");
       setCategoryId(product.categoryId || categories[0]?.id || "");
-      setBrand(product.brand || "Sivakasi Sparklers");
+      setBrand(product.brand || DEFAULT_SITE_CONFIG.name);
       setPackSize(product.packSize || "1 Box");
       setUnit(product.unit || "Box");
       setMrpRupees((product.mrpPaise / 100).toString());
@@ -69,7 +70,7 @@ export function ProductModal({
       setSku(`SPK-${Date.now().toString().slice(-4)}`);
       setName("");
       setCategoryId(categories[0]?.id || "");
-      setBrand("Sivakasi Sparklers");
+      setBrand(DEFAULT_SITE_CONFIG.name);
       setPackSize("1 Box");
       setUnit("Box");
       setMrpRupees("200");

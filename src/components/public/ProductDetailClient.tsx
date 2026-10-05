@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import {
   Plus,
   Minus,
@@ -9,12 +10,15 @@ import {
   MessageCircle,
   Phone,
   AlertTriangle,
+  CheckCircle2,
+  ArrowRight,
 } from "lucide-react";
 import { formatPaise, calculateDiscountPercent } from "@/lib/utils/money";
 import { useCartStore } from "@/store/useCartStore";
 import { Button } from "../ui/Button";
 import { Badge } from "../ui/Badge";
 import { SparkBurst } from "./SparkBurst";
+import { DEFAULT_SITE_CONFIG } from "@/lib/settings/siteConfig";
 
 interface ProductDetailClientProps {
   product: {
@@ -44,13 +48,18 @@ interface ProductDetailClientProps {
 
 export function ProductDetailClient({
   product,
-  phone = "+91 98765 43210",
-  whatsappNumber = "919876543210",
-  brandName = "Sivakasi Sparklers",
+  phone = DEFAULT_SITE_CONFIG.phone,
+  whatsappNumber = DEFAULT_SITE_CONFIG.whatsappNumber,
+  brandName = DEFAULT_SITE_CONFIG.name,
 }: ProductDetailClientProps) {
+  const safeBrandName = (!brandName || brandName === "[BRAND_NAME]") ? DEFAULT_SITE_CONFIG.name : brandName;
+  const safePhone = (!phone || phone.includes("98765")) ? DEFAULT_SITE_CONFIG.phone : phone;
+  const safeWa = (!whatsappNumber || whatsappNumber.includes("98765")) ? DEFAULT_SITE_CONFIG.whatsappNumber : whatsappNumber;
+
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [qty, setQty] = useState(1);
   const [activeSpark, setActiveSpark] = useState(false);
+  const [justAdded, setJustAdded] = useState(false);
 
   const addItem = useCartStore((state) => state.addItem);
   const triggerSpark = useCartStore((state) => state.triggerSpark);
@@ -85,13 +94,14 @@ export function ProductDetailClient({
     );
     triggerSpark(product.id);
     setActiveSpark(true);
+    setJustAdded(true);
     setTimeout(() => setActiveSpark(false), 600);
   };
 
-  const cleanPhone = phone.replace(/[^0-9+]/g, "");
-  const cleanWa = whatsappNumber.replace(/[^0-9]/g, "");
+  const cleanPhone = safePhone.replace(/[^0-9+]/g, "");
+  const cleanWa = safeWa.replace(/[^0-9]/g, "");
   const waEnquiryText = encodeURIComponent(
-    `Hello ${brandName}, I would like to enquire about ${product.name} (${product.sku}) - Price: ${formatPaise(product.pricePaise)}`
+    `Hello ${safeBrandName},\n\nI would like to enquire about:\nProduct: ${product.name} (${product.sku})\nPack Size: ${product.packSize}\nQuantity: ${qty}\nEstimate: ${formatPaise(product.pricePaise * qty)}\n\nPlease confirm availability and delivery details.`
   );
 
   return (
@@ -190,40 +200,70 @@ export function ProductDetailClient({
           </p>
         )}
 
-        {/* Quantity Stepper & Add to Enquiry */}
-        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 mb-6">
-          <div className="inline-flex items-center justify-between rounded-xl bg-white/10 border border-white/10 p-1 min-h-[44px]">
-            <button
-              onClick={() => setQty(Math.max(1, qty - 1))}
+        {/* Quantity Stepper, Price Calculation & Add to Enquiry */}
+        <div className="space-y-3 mb-6">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+            <div className="inline-flex items-center justify-between rounded-xl bg-white/10 border border-white/10 p-1 min-h-[44px]">
+              <button
+                onClick={() => setQty(Math.max(1, qty - 1))}
+                disabled={!isAvailable}
+                className="min-h-[44px] min-w-[44px] flex items-center justify-center text-text-muted hover:text-foreground disabled:opacity-40 transition-colors"
+                aria-label="Decrease quantity"
+              >
+                <Minus className="w-4 h-4" />
+              </button>
+              <span className="w-12 text-center text-sm font-bold text-foreground">
+                {qty}
+              </span>
+              <button
+                onClick={() => setQty(qty + 1)}
+                disabled={!isAvailable}
+                className="min-h-[44px] min-w-[44px] flex items-center justify-center text-text-muted hover:text-foreground disabled:opacity-40 transition-colors"
+                aria-label="Increase quantity"
+              >
+                <Plus className="w-4 h-4" />
+              </button>
+            </div>
+
+            <Button
+              onClick={handleAdd}
               disabled={!isAvailable}
-              className="p-2 text-text-muted hover:text-foreground disabled:opacity-40 transition-colors"
-              aria-label="Decrease quantity"
+              variant={isAvailable ? "primary" : "outline"}
+              size="lg"
+              className="flex-1 font-bold flex items-center justify-center gap-2 shadow-xl shadow-accent-magenta/20 min-h-[44px]"
             >
-              <Minus className="w-4 h-4" />
-            </button>
-            <span className="w-12 text-center text-sm font-bold text-foreground">
-              {qty}
-            </span>
-            <button
-              onClick={() => setQty(qty + 1)}
-              disabled={!isAvailable}
-              className="p-2 text-text-muted hover:text-foreground disabled:opacity-40 transition-colors"
-              aria-label="Increase quantity"
-            >
-              <Plus className="w-4 h-4" />
-            </button>
+              <ShoppingBag className="w-4 h-4" />
+              <span>{isAvailable ? "Add to Enquiry" : "Currently Out of Stock"}</span>
+            </Button>
           </div>
 
-          <Button
-            onClick={handleAdd}
-            disabled={!isAvailable}
-            variant={isAvailable ? "primary" : "outline"}
-            size="lg"
-            className="flex-1 font-bold flex items-center justify-center gap-2 shadow-xl shadow-accent-magenta/20 min-h-[44px]"
-          >
-            <ShoppingBag className="w-4 h-4" />
-            <span>{isAvailable ? "Add to Enquiry" : "Currently Out of Stock"}</span>
-          </Button>
+          {/* Dynamic Price Calculation */}
+          <div className="text-xs text-text-muted px-1 flex items-center justify-between">
+            <span>
+              Price breakdown: <strong className="text-foreground">{formatPaise(product.pricePaise)}</strong> × {qty} {qty === 1 ? product.unit : `${product.unit}s`}
+            </span>
+            <span>
+              Total: <strong className="text-accent-gold font-bold text-sm">{formatPaise(product.pricePaise * qty)}</strong>
+            </span>
+          </div>
+
+          {/* Added to Enquiry Feedback Banner */}
+          {justAdded && (
+            <div className="p-3.5 rounded-xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 text-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3 animate-slideUp">
+              <div className="flex items-center gap-2">
+                <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+                <span>
+                  <strong>{qty} × {product.name}</strong> added to your enquiry!
+                </span>
+              </div>
+              <Link href="/enquiry" className="shrink-0">
+                <Button variant="primary" size="sm" className="w-full sm:w-auto font-bold py-1.5 px-3 text-xs flex items-center justify-center gap-1.5">
+                  <span>Review Enquiry</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </Button>
+              </Link>
+            </div>
+          )}
         </div>
 
         {/* Direct WhatsApp and Phone Buttons */}

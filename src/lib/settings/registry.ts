@@ -1,14 +1,19 @@
 import { z } from "zod";
+import { DEFAULT_SITE_CONFIG } from "./siteConfig";
 
 export const SettingsSchemaMap = {
-  businessName: z.string().default("[BRAND_NAME]"),
+  businessName: z.string().default(DEFAULT_SITE_CONFIG.name),
+  businessShortName: z.string().default(DEFAULT_SITE_CONFIG.shortName),
   logo: z.string().default(""),
   favicon: z.string().default(""),
-  phone: z.string().default("+91 98765 43210"),
-  whatsappNumber: z.string().default("919876543210"),
-  email: z.string().email().default("contact@crackers.local"),
-  address: z.string().default("Sivakasi, Tamil Nadu 626123, India"),
-  hours: z.string().default("Mon - Sat: 9:00 AM - 9:00 PM IST"),
+  phone: z.string().default(DEFAULT_SITE_CONFIG.phone),
+  whatsappNumber: z.string().default(DEFAULT_SITE_CONFIG.whatsappNumber),
+  email: z.string().default(""),
+  address: z.string().default(DEFAULT_SITE_CONFIG.address),
+  city: z.string().default(DEFAULT_SITE_CONFIG.city),
+  state: z.string().default(DEFAULT_SITE_CONFIG.state),
+  pincode: z.string().default(DEFAULT_SITE_CONFIG.pincode),
+  hours: z.string().default(DEFAULT_SITE_CONFIG.hours),
   licenseNumber: z.string().default(""), // Empty hides badge
   enforceMinOrder: z.boolean().default(true),
   shippingWording: z.string().default(
@@ -24,7 +29,7 @@ export const SettingsSchemaMap = {
   countdownTitle: z.string().default("Diwali 2026 Booking Season Closes In:"),
   maintenanceMode: z.boolean().default(false),
   enquiriesOpen: z.boolean().default(true),
-  notificationEmail: z.string().email().default("owner@crackers.local"),
+  notificationEmail: z.string().default(""),
   socialLinks: z
     .object({
       facebook: z.string().optional().default(""),
@@ -34,11 +39,11 @@ export const SettingsSchemaMap = {
     .default({}),
   defaultSeoTitle: z
     .string()
-    .default("Sivakasi Crackers Price List & Bulk Enquiry 2026"),
+    .default("Festivo Fireworks | Sivakasi Crackers Price List & Bulk Enquiry 2026"),
   defaultSeoDesc: z
     .string()
     .default(
-      "Direct Sivakasi fireworks price list and festival enquiry platform. Browse premium sparklers, flower pots, rockets and combos."
+      "Direct Sivakasi fireworks price list and festival enquiry platform by Festivo Fireworks. Browse premium sparklers, flower pots, rockets and combos."
     ),
   analyticsScript: z.string().default(""),
   defaultTheme: z.enum(["dark", "light"]).default("dark"),

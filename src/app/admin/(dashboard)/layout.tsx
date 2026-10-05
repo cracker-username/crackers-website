@@ -2,9 +2,10 @@ import React from "react";
 import { redirect } from "next/navigation";
 import { getAdminSession } from "@/lib/auth/session";
 import { AdminSidebar } from "@/components/admin/AdminSidebar";
+import { DEFAULT_SITE_CONFIG } from "@/lib/settings/siteConfig";
 
 export const metadata = {
-  title: "Admin Dashboard — Sivakasi Sparklers",
+  title: `Admin Dashboard — ${DEFAULT_SITE_CONFIG.name}`,
   robots: { index: false, follow: false },
 };
 

@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import { formatPaise } from "@/lib/utils/money";
 import { Button } from "../ui/Button";
+import { DEFAULT_SITE_CONFIG } from "@/lib/settings/siteConfig";
 
 interface TrackingResult {
   enquiryNumber: string;
@@ -140,7 +141,7 @@ export function TrackEnquiryClient() {
                 <input
                   type="tel"
                   maxLength={10}
-                  placeholder="9876543210"
+                  placeholder="9172600587"
                   value={mobile}
                   onChange={(e) => setMobile(e.target.value.replace(/\D/g, ""))}
                   className="w-full pl-11 pr-3 py-2.5 rounded-lg bg-surface-2 border border-border text-sm text-text focus:outline-none focus:border-accent-gold"
@@ -359,7 +360,7 @@ export function TrackEnquiryClient() {
           <div className="pt-4 border-t border-border flex justify-between items-center">
             <span className="text-xs text-muted">Need fast help with this enquiry?</span>
             <a
-              href="https://wa.me/919876543210"
+              href={DEFAULT_SITE_CONFIG.whatsappDeepLink}
               target="_blank"
               rel="noopener noreferrer"
             >

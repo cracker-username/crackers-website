@@ -5,28 +5,41 @@ import { parseSettingValue } from "@/lib/settings/registry";
 import { Phone, MessageCircle, Mail, MapPin, Clock, HelpCircle } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/Button";
+import { DEFAULT_SITE_CONFIG } from "@/lib/settings/siteConfig";
 
 export const metadata: Metadata = {
-  title: "Contact Us — Sivakasi Sparklers Direct Enquiries",
+  title: `Contact Us — ${DEFAULT_SITE_CONFIG.name} Direct Enquiries`,
   description:
     "Get in touch with our Sivakasi fireworks dispatch desk via Phone or WhatsApp for enquiry questions, transport feasibility, and estimates.",
 };
 
 export default async function ContactPage() {
-  let brandName = "Sivakasi Sparklers";
-  let phone = "+91 98765 43210";
-  let whatsappNumber = "919876543210";
-  let email = "contact@crackers.local";
-  let address = "Sivakasi, Tamil Nadu 626123, India";
-  let hours = "Mon - Sat: 9:00 AM - 9:00 PM IST";
+  let brandName = DEFAULT_SITE_CONFIG.name;
+  let phone = DEFAULT_SITE_CONFIG.phone;
+  let whatsappNumber = DEFAULT_SITE_CONFIG.whatsappNumber;
+  let email = DEFAULT_SITE_CONFIG.email;
+  let address = DEFAULT_SITE_CONFIG.address;
+  let hours = DEFAULT_SITE_CONFIG.hours;
 
   try {
     const settings = await prisma.setting.findMany();
     const map = new Map(settings.map((s) => [s.key, s.value]));
-    if (map.has("businessName")) brandName = parseSettingValue("businessName", map.get("businessName"));
-    if (map.has("phone")) phone = parseSettingValue("phone", map.get("phone"));
-    if (map.has("whatsappNumber")) whatsappNumber = parseSettingValue("whatsappNumber", map.get("whatsappNumber"));
-    if (map.has("email")) email = parseSettingValue("email", map.get("email"));
+    if (map.has("businessName")) {
+      const val = parseSettingValue("businessName", map.get("businessName"));
+      if (val && val !== "[BRAND_NAME]") brandName = val;
+    }
+    if (map.has("phone")) {
+      const val = parseSettingValue("phone", map.get("phone"));
+      if (val && !val.includes("98765")) phone = val;
+    }
+    if (map.has("whatsappNumber")) {
+      const val = parseSettingValue("whatsappNumber", map.get("whatsappNumber"));
+      if (val && !val.includes("98765")) whatsappNumber = val;
+    }
+    if (map.has("email")) {
+      const val = parseSettingValue("email", map.get("email"));
+      if (val && !val.includes("crackers.local")) email = val;
+    }
     if (map.has("address")) address = parseSettingValue("address", map.get("address"));
     if (map.has("hours")) hours = parseSettingValue("hours", map.get("hours"));
   } catch (e) {
@@ -107,13 +120,15 @@ export default async function ContactPage() {
           </div>
         </div>
 
-        <div className="flex items-start gap-3">
-          <Mail className="w-5 h-5 text-accent-cyan shrink-0 mt-0.5" />
-          <div>
-            <h4 className="font-heading font-bold text-sm text-foreground mb-1">Email Desk</h4>
-            <p className="text-xs text-text-muted leading-relaxed">{email}</p>
+        {email && email.length > 0 && (
+          <div className="flex items-start gap-3">
+            <Mail className="w-5 h-5 text-accent-cyan shrink-0 mt-0.5" />
+            <div>
+              <h4 className="font-heading font-bold text-sm text-foreground mb-1">Email Desk</h4>
+              <p className="text-xs text-text-muted leading-relaxed">{email}</p>
+            </div>
           </div>
-        </div>
+        )}
       </div>
 
       <div className="mt-8 text-center">

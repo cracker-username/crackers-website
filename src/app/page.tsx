@@ -280,7 +280,7 @@ export default async function HomePage() {
             <Link href="/contact">
               <Button variant="outline" size="lg" className="flex items-center gap-2">
                 <PhoneCall className="w-4 h-4 text-accent-gold" />
-                <span>Contact Sivakasi Team</span>
+                <span>Contact Our Desk</span>
               </Button>
             </Link>
           </div>

@@ -38,7 +38,9 @@ async function main() {
     const defaultValue = schema.parse(undefined);
     await prisma.setting.upsert({
       where: { key },
-      update: {},
+      update: {
+        value: defaultValue as any,
+      },
       create: {
         key,
         value: defaultValue as any,
@@ -620,6 +622,19 @@ async function main() {
     });
   }
   console.log("✅ Legal and statutory pages seeded.");
+
+  // Normalize product brands
+  await prisma.product.updateMany({
+    where: {
+      OR: [
+        { brand: "[BRAND_NAME]" },
+        { brand: "Sivakasi Sparklers" },
+        { brand: null },
+      ],
+    },
+    data: { brand: "FESTIVO FIREWORKS" },
+  });
+  console.log("✅ Product brands normalized to FESTIVO FIREWORKS.");
 
   console.log("🎉 Database Seed Completed Successfully!");
 }

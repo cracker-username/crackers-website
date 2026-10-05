@@ -5,6 +5,8 @@ import { ClientShell } from "@/components/public/ClientShell";
 import { prisma } from "@/lib/db/prisma";
 import { parseSettingValue } from "@/lib/settings/registry";
 
+import { DEFAULT_SITE_CONFIG } from "@/lib/settings/siteConfig";
+
 const baloo = Baloo_2({
   subsets: ["latin"],
   weight: ["600", "700", "800"],
@@ -19,13 +21,13 @@ const poppins = Poppins({
   display: "swap",
 });
 
-const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL || "https://crackers.local").replace(/\/$/, "");
+const siteUrl = (process.env.NEXT_PUBLIC_APP_URL || process.env.NEXT_PUBLIC_SITE_URL || DEFAULT_SITE_CONFIG.siteUrl).replace(/\/$/, "");
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: {
-    default: "Sivakasi Crackers Price List & Bulk Enquiry 2026 | Sivakasi Sparklers",
-    template: "%s | Sivakasi Sparklers",
+    default: `Sivakasi Crackers Price List & Bulk Enquiry 2026 | ${DEFAULT_SITE_CONFIG.name}`,
+    template: `%s | ${DEFAULT_SITE_CONFIG.name}`,
   },
   description:
     "Direct Sivakasi fireworks price list and festival enquiry platform. Browse premium sparklers, flower pots, rockets, ground chakkars, and family combo boxes with genuine factory estimates.",
@@ -37,9 +39,9 @@ export const metadata: Metadata = {
     "Sivakasi crackers factory direct",
     "green crackers Sivakasi",
   ],
-  authors: [{ name: "Sivakasi Sparklers" }],
-  creator: "Sivakasi Sparklers",
-  publisher: "Sivakasi Sparklers",
+  authors: [{ name: DEFAULT_SITE_CONFIG.name }],
+  creator: DEFAULT_SITE_CONFIG.name,
+  publisher: DEFAULT_SITE_CONFIG.name,
   robots: {
     index: true,
     follow: true,
@@ -55,7 +57,7 @@ export const metadata: Metadata = {
     type: "website",
     locale: "en_IN",
     url: siteUrl,
-    siteName: "Sivakasi Sparklers",
+    siteName: DEFAULT_SITE_CONFIG.name,
     title: "Sivakasi Crackers Price List & Bulk Enquiry 2026",
     description:
       "Direct Sivakasi fireworks price list and festival enquiry platform. Browse genuine sparklers, flower pots, rockets, and festival combo boxes.",
@@ -74,29 +76,41 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   // Query settings safely from database for public shell
-  let brandName = "Sivakasi Sparklers";
-  let phone = "+91 98765 43210";
-  let whatsappNumber = "919876543210";
-  let email = "contact@crackers.local";
-  let address = "Sivakasi, Tamil Nadu 626123, India";
-  let hours = "Mon - Sat: 9:00 AM - 9:00 PM IST";
-  let licenseNumber = "";
+  let brandName = DEFAULT_SITE_CONFIG.name;
+  let phone = DEFAULT_SITE_CONFIG.phone;
+  let whatsappNumber = DEFAULT_SITE_CONFIG.whatsappNumber;
+  let email = DEFAULT_SITE_CONFIG.email;
+  let address = DEFAULT_SITE_CONFIG.address;
+  let hours = DEFAULT_SITE_CONFIG.hours;
+  let licenseNumber = DEFAULT_SITE_CONFIG.licenseNumber;
 
   try {
     const settings = await prisma.setting.findMany();
     const settingsMap = new Map(settings.map((s) => [s.key, s.value]));
 
     if (settingsMap.has("businessName")) {
-      brandName = parseSettingValue("businessName", settingsMap.get("businessName"));
+      const val = parseSettingValue("businessName", settingsMap.get("businessName"));
+      if (val && val !== "[BRAND_NAME]") {
+        brandName = val;
+      }
     }
     if (settingsMap.has("phone")) {
-      phone = parseSettingValue("phone", settingsMap.get("phone"));
+      const val = parseSettingValue("phone", settingsMap.get("phone"));
+      if (val && !val.includes("98765")) {
+        phone = val;
+      }
     }
     if (settingsMap.has("whatsappNumber")) {
-      whatsappNumber = parseSettingValue("whatsappNumber", settingsMap.get("whatsappNumber"));
+      const val = parseSettingValue("whatsappNumber", settingsMap.get("whatsappNumber"));
+      if (val && !val.includes("98765")) {
+        whatsappNumber = val;
+      }
     }
     if (settingsMap.has("email")) {
-      email = parseSettingValue("email", settingsMap.get("email"));
+      const val = parseSettingValue("email", settingsMap.get("email"));
+      if (val && !val.includes("crackers.local")) {
+        email = val;
+      }
     }
     if (settingsMap.has("address")) {
       address = parseSettingValue("address", settingsMap.get("address"));

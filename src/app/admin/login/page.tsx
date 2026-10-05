@@ -1,9 +1,10 @@
 import React, { Suspense } from "react";
 import type { Metadata } from "next";
 import { LoginForm } from "@/components/admin/LoginForm";
+import { DEFAULT_SITE_CONFIG } from "@/lib/settings/siteConfig";
 
 export const metadata: Metadata = {
-  title: "Admin Sign In — Sivakasi Sparklers",
+  title: `Admin Sign In — ${DEFAULT_SITE_CONFIG.name}`,
   robots: { index: false, follow: false },
 };
 

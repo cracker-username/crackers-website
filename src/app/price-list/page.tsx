@@ -5,13 +5,13 @@ import { parseSettingValue } from "@/lib/settings/registry";
 import { ProductCard } from "@/components/public/ProductCard";
 import { QuickOrderTable } from "@/components/public/QuickOrderTable";
 import { PriceListFilterBar } from "@/components/public/PriceListFilterBar";
-import { StickyEnquiryBar } from "@/components/public/StickyEnquiryBar";
 import { Sparkles, FileSpreadsheet } from "lucide-react";
+import { DEFAULT_SITE_CONFIG } from "@/lib/settings/siteConfig";
 
 export const metadata: Metadata = {
-  title: "Sivakasi Crackers Price List 2026 — Genuine Factory Estimates",
+  title: `Sivakasi Crackers Price List 2026 — ${DEFAULT_SITE_CONFIG.name}`,
   description:
-    "Complete Sivakasi firecrackers price list 2026. Browse sparklers, pots, rockets, ground chakkars and multi-shot aerial repeaters with instant enquiry quotation.",
+    `Complete Sivakasi firecrackers price list 2026 from ${DEFAULT_SITE_CONFIG.name}. Browse sparklers, pots, rockets, ground chakkars and multi-shot aerial repeaters with instant enquiry quotation.`,
 };
 
 interface PriceListPageProps {
@@ -125,7 +125,7 @@ export default async function PriceListPage({ searchParams }: PriceListPageProps
     images: p.images.map((img) => ({ url: img.url, altText: img.altText })),
   }));
 
-  const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL || "https://crackers.local").replace(/\/$/, "");
+  const siteUrl = (process.env.NEXT_PUBLIC_APP_URL || process.env.NEXT_PUBLIC_SITE_URL || DEFAULT_SITE_CONFIG.siteUrl).replace(/\/$/, "");
 
   const breadcrumbJsonLd = {
     "@context": "https://schema.org",
@@ -222,9 +222,6 @@ export default async function PriceListPage({ searchParams }: PriceListPageProps
           showMrpAndDiscount={showMrpAndDiscount}
         />
       )}
-
-      {/* Persistent Bottom Sticky Summary Bar */}
-      <StickyEnquiryBar />
     </div>
   );
 }

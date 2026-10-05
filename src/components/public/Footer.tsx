@@ -1,6 +1,7 @@
 import React from "react";
 import Link from "next/link";
 import { Sparkles, Phone, Mail, MapPin, Clock, ArrowUp, Shield } from "lucide-react";
+import { DEFAULT_SITE_CONFIG } from "@/lib/settings/siteConfig";
 
 interface FooterProps {
   brandName?: string;
@@ -13,14 +14,18 @@ interface FooterProps {
 }
 
 export function Footer({
-  brandName = "Sivakasi Sparklers",
-  phone = "+91 98765 43210",
-  whatsappNumber = "919876543210",
-  email = "contact@crackers.local",
-  address = "Sivakasi, Tamil Nadu 626123, India",
-  hours = "Mon - Sat: 9:00 AM - 9:00 PM IST",
-  licenseNumber = "",
+  brandName = DEFAULT_SITE_CONFIG.name,
+  phone = DEFAULT_SITE_CONFIG.phone,
+  whatsappNumber = DEFAULT_SITE_CONFIG.whatsappNumber,
+  email = DEFAULT_SITE_CONFIG.email,
+  address = DEFAULT_SITE_CONFIG.address,
+  hours = DEFAULT_SITE_CONFIG.hours,
+  licenseNumber = DEFAULT_SITE_CONFIG.licenseNumber,
 }: FooterProps) {
+  const safeBrandName = (!brandName || brandName === "[BRAND_NAME]") ? DEFAULT_SITE_CONFIG.name : brandName;
+  const safePhone = (!phone || phone.includes("98765")) ? DEFAULT_SITE_CONFIG.phone : phone;
+  const safeWa = (!whatsappNumber || whatsappNumber.includes("98765")) ? DEFAULT_SITE_CONFIG.whatsappNumber : whatsappNumber;
+  const safeEmail = (!email || email.includes("crackers.local")) ? "" : email;
   const currentYear = new Date().getFullYear();
 
   return (
@@ -34,7 +39,7 @@ export function Footer({
                 <Sparkles className="w-4 h-4" />
               </div>
               <span className="font-heading font-extrabold text-lg text-foreground tracking-tight">
-                {brandName}
+                {safeBrandName}
               </span>
             </Link>
             <p className="text-xs leading-relaxed text-text-muted">
@@ -63,6 +68,11 @@ export function Footer({
               <li>
                 <Link href="/combos" className="hover:text-accent-gold transition-colors">
                   Festival Combo Packs
+                </Link>
+              </li>
+              <li>
+                <Link href="/enquiry" className="hover:text-accent-gold text-accent-magenta font-semibold transition-colors">
+                  Review Enquiry
                 </Link>
               </li>
               <li>
@@ -129,27 +139,29 @@ export function Footer({
               </li>
               <li className="flex items-center gap-2.5">
                 <Phone className="w-4 h-4 text-accent-gold shrink-0" />
-                <a href={`tel:${phone.replace(/[^0-9+]/g, "")}`} className="hover:text-foreground">
-                  {phone}
+                <a href={`tel:${safePhone.replace(/[^0-9+]/g, "")}`} className="hover:text-foreground">
+                  {safePhone}
                 </a>
               </li>
               <li className="flex items-center gap-2.5">
                 <span className="w-4 h-4 text-emerald-400 font-bold shrink-0 text-center text-xs">WA</span>
                 <a
-                  href={`https://wa.me/${whatsappNumber.replace(/[^0-9]/g, "")}`}
+                  href={`https://wa.me/${safeWa.replace(/[^0-9]/g, "")}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="hover:text-foreground"
                 >
-                  +{whatsappNumber}
+                  +{safeWa}
                 </a>
               </li>
-              <li className="flex items-center gap-2.5">
-                <Mail className="w-4 h-4 text-accent-cyan shrink-0" />
-                <a href={`mailto:${email}`} className="hover:text-foreground">
-                  {email}
-                </a>
-              </li>
+              {safeEmail && safeEmail.length > 0 && (
+                <li className="flex items-center gap-2.5">
+                  <Mail className="w-4 h-4 text-accent-cyan shrink-0" />
+                  <a href={`mailto:${safeEmail}`} className="hover:text-foreground">
+                    {safeEmail}
+                  </a>
+                </li>
+              )}
               <li className="flex items-center gap-2.5">
                 <Clock className="w-4 h-4 text-accent-lime shrink-0" />
                 <span>{hours}</span>
@@ -173,7 +185,7 @@ export function Footer({
 
         {/* Bottom Bar & Back to Top */}
         <div className="pt-6 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs">
-          <p>© {currentYear} {brandName}. All rights reserved.</p>
+          <p>© {currentYear} {safeBrandName}. All rights reserved.</p>
           <button
             onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
             type="button"

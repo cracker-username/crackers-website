@@ -3,6 +3,7 @@ import { prisma } from "@/lib/db/prisma";
 import { withAdminAuth } from "@/lib/auth/session";
 import { z } from "zod";
 import { revalidateTag } from "next/cache";
+import { DEFAULT_SITE_CONFIG } from "@/lib/settings/siteConfig";
 
 const CreateProductSchema = z.object({
   sku: z.string().trim().min(1).max(50),
@@ -11,7 +12,7 @@ const CreateProductSchema = z.object({
   categoryId: z.string().uuid(),
   shortDesc: z.string().trim().optional(),
   longDesc: z.string().trim().optional(),
-  brand: z.string().trim().default("Sivakasi Sparklers"),
+  brand: z.string().trim().default(DEFAULT_SITE_CONFIG.name),
   packSize: z.string().trim().min(1),
   unit: z.string().trim().min(1),
   mrpPaise: z.number().int().min(0),
@@ -129,7 +130,7 @@ export async function POST(req: NextRequest) {
         categoryId: data.categoryId,
         shortDesc: data.shortDesc || null,
         longDesc: data.longDesc || null,
-        brand: data.brand || "Sivakasi Sparklers",
+        brand: data.brand || DEFAULT_SITE_CONFIG.name,
         packSize: data.packSize,
         unit: data.unit,
         mrpPaise: data.mrpPaise,

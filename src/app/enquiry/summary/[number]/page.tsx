@@ -9,6 +9,7 @@ import { parseSettingValue } from "@/lib/settings/registry";
 import { PrintButton } from "@/components/public/PrintButton";
 import { Button } from "@/components/ui/Button";
 import { ShieldAlert, ArrowLeft } from "lucide-react";
+import { DEFAULT_SITE_CONFIG } from "@/lib/settings/siteConfig";
 
 interface SummaryPageProps {
   params: Promise<{ number: string }>;
@@ -74,12 +75,18 @@ export default async function EnquirySummaryPage({
     prisma.setting.findUnique({ where: { key: "licenseNumber" } }),
   ]);
 
-  const businessName = (bizName ? parseSettingValue("businessName", bizName.value) : "Sivakasi Sparklers") as string;
-  const businessPhone = (bizPhone ? parseSettingValue("phone", bizPhone.value) : "+919876543210") as string;
-  const contactEmail = (bizEmail ? parseSettingValue("email", bizEmail.value) : "contact@crackers.local") as string;
+  let businessName = (bizName ? parseSettingValue("businessName", bizName.value) : DEFAULT_SITE_CONFIG.name) as string;
+  if (!businessName || businessName === "[BRAND_NAME]") businessName = DEFAULT_SITE_CONFIG.name;
+
+  let businessPhone = (bizPhone ? parseSettingValue("phone", bizPhone.value) : DEFAULT_SITE_CONFIG.phone) as string;
+  if (!businessPhone || businessPhone.includes("98765")) businessPhone = DEFAULT_SITE_CONFIG.phone;
+
+  let contactEmail = (bizEmail ? parseSettingValue("email", bizEmail.value) : "") as string;
+  if (contactEmail.includes("crackers.local")) contactEmail = "";
+
   const businessAddress = (bizAddress
     ? parseSettingValue("address", bizAddress.value)
-    : "Main Road, Sivakasi, Virudhunagar District, Tamil Nadu — 626123") as string;
+    : DEFAULT_SITE_CONFIG.address) as string;
   const licence = (licenceNo ? parseSettingValue("licenseNumber", licenceNo.value) : "") as string;
 
   const istDate = new Date(enquiry.createdAt).toLocaleDateString("en-IN", {

@@ -2,11 +2,11 @@ import React from "react";
 import { Metadata } from "next";
 import { prisma } from "@/lib/db/prisma";
 import { ComboCard } from "@/components/public/ComboCard";
-import { StickyEnquiryBar } from "@/components/public/StickyEnquiryBar";
 import { Gift } from "lucide-react";
+import { DEFAULT_SITE_CONFIG } from "@/lib/settings/siteConfig";
 
 export const metadata: Metadata = {
-  title: "Festival Firecracker Combo Packs 2026 — Sivakasi Sparklers",
+  title: `Festival Firecracker Combo Packs 2026 — ${DEFAULT_SITE_CONFIG.name}`,
   description:
     "Curated Diwali cracker gift boxes and family celebration combos directly from Sivakasi. Save up to 50% compared to buying individual items.",
 };
@@ -64,9 +64,6 @@ export default async function CombosPage() {
           <ComboCard key={combo.id} combo={combo} />
         ))}
       </div>
-
-      {/* Sticky Enquiry Bar */}
-      <StickyEnquiryBar />
     </div>
   );
 }

@@ -2,6 +2,7 @@
 
 import React from "react";
 import { MessageCircle } from "lucide-react";
+import { DEFAULT_SITE_CONFIG } from "@/lib/settings/siteConfig";
 
 interface FloatingWhatsAppProps {
   whatsappNumber?: string;
@@ -10,13 +11,15 @@ interface FloatingWhatsAppProps {
 }
 
 export function FloatingWhatsApp({
-  whatsappNumber = "919876543210",
-  brandName = "Sivakasi Sparklers",
+  whatsappNumber = DEFAULT_SITE_CONFIG.whatsappNumber,
+  brandName = DEFAULT_SITE_CONFIG.name,
   hasStickyBar = false,
 }: FloatingWhatsAppProps) {
-  const cleanNumber = whatsappNumber.replace(/[^0-9]/g, "");
+  const safeBrandName = (!brandName || brandName === "[BRAND_NAME]") ? DEFAULT_SITE_CONFIG.name : brandName;
+  const safeWa = (!whatsappNumber || whatsappNumber.includes("98765")) ? DEFAULT_SITE_CONFIG.whatsappNumber : whatsappNumber;
+  const cleanNumber = safeWa.replace(/[^0-9]/g, "");
   const defaultText = encodeURIComponent(
-    `Hello ${brandName}, I would like to enquire about crackers availability.`
+    `Hello ${safeBrandName}, I would like to enquire about crackers availability.`
   );
 
   return (

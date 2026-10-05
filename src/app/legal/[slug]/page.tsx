@@ -4,6 +4,7 @@ import { Metadata } from "next";
 import { prisma } from "@/lib/db/prisma";
 import Link from "next/link";
 import { ChevronRight, FileText } from "lucide-react";
+import { DEFAULT_SITE_CONFIG } from "@/lib/settings/siteConfig";
 
 interface LegalPageProps {
   params: Promise<{ slug: string }>;
@@ -17,7 +18,7 @@ export async function generateMetadata({
   if (!page) return { title: "Page Not Found" };
 
   return {
-    title: `${page.title} — Sivakasi Sparklers`,
+    title: `${page.title} — ${DEFAULT_SITE_CONFIG.name}`,
     description: `Official policy document: ${page.title}.`,
   };
 }

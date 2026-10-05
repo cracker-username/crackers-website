@@ -1,9 +1,10 @@
 import React from "react";
 import type { Metadata } from "next";
 import { TrackEnquiryClient } from "@/components/public/TrackEnquiryClient";
+import { DEFAULT_SITE_CONFIG } from "@/lib/settings/siteConfig";
 
 export const metadata: Metadata = {
-  title: "Track Enquiry Status — Sivakasi Sparklers",
+  title: `Track Enquiry Status — ${DEFAULT_SITE_CONFIG.name}`,
   description: "Check the live dispatch status, carton packing progress, and parcel transport details of your festival enquiry.",
 };
 

@@ -507,7 +507,7 @@ export function EnquiryForm() {
                 <input
                   type="tel"
                   maxLength={10}
-                  placeholder="9876543210"
+                  placeholder="9172600587"
                   value={mobile}
                   onChange={(e) => setMobile(e.target.value.replace(/\D/g, ""))}
                   className="w-full pl-11 pr-3 py-2 rounded-lg bg-surface-2 border border-border text-sm text-text focus:outline-none focus:border-accent-gold"
@@ -536,7 +536,7 @@ export function EnquiryForm() {
                   <input
                     type="tel"
                     maxLength={10}
-                    placeholder="9876543210"
+                    placeholder="9172600587"
                     value={whatsapp}
                     onChange={(e) => setWhatsapp(e.target.value.replace(/\D/g, ""))}
                     className="w-full pl-11 pr-3 py-2 rounded-lg bg-surface-2 border border-border text-sm text-text focus:outline-none focus:border-accent-gold"
@@ -553,7 +553,7 @@ export function EnquiryForm() {
               </label>
               <input
                 type="email"
-                placeholder="name@example.com"
+                placeholder="e.g. yourname@gmail.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className="w-full px-3 py-2 rounded-lg bg-surface-2 border border-border text-sm text-text focus:outline-none focus:border-accent-gold"

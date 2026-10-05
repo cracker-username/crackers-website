@@ -167,7 +167,7 @@ export function SettingsClient({ initialSettings }: SettingsClientProps) {
               required
               value={settings.whatsappNumber || ""}
               onChange={(e) => updateField("whatsappNumber", e.target.value)}
-              placeholder="e.g. 919876543210 (with country code, no +)"
+              placeholder="e.g. 919172600587 (with country code, no +)"
               className="w-full bg-brand-bg-0 border border-white/10 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-brand-primary font-mono"
             />
           </div>

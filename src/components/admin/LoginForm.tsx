@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { ShieldCheck, Lock, Mail, AlertCircle, Loader2, Eye, EyeOff } from "lucide-react";
 import { Button } from "@/components/ui/Button";
+import { DEFAULT_SITE_CONFIG } from "@/lib/settings/siteConfig";
 
 export function LoginForm() {
   const router = useRouter();
@@ -62,7 +63,7 @@ export function LoginForm() {
         <div className="w-14 h-14 mx-auto rounded-2xl bg-gradient-to-tr from-accent-magenta to-accent-orange flex items-center justify-center text-white shadow-lg mb-4">
           <ShieldCheck className="w-8 h-8" />
         </div>
-        <h1 className="text-2xl font-black font-heading text-white">Sivakasi Sparklers</h1>
+        <h1 className="text-2xl font-black font-heading text-white">{DEFAULT_SITE_CONFIG.name}</h1>
         <p className="text-xs text-text-muted mt-1 uppercase tracking-wider font-semibold">
           Admin Operations Portal
         </p>
@@ -79,7 +80,7 @@ export function LoginForm() {
             <input
               type="email"
               autoComplete="email"
-              placeholder="admin@crackers.local"
+              placeholder="admin@festivofireworks.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               className="w-full pl-10 pr-3 py-2.5 rounded-lg bg-bg-0 border border-white/20 text-sm text-white placeholder:text-white/40 focus:outline-none focus:border-accent-gold focus:ring-1 focus:ring-accent-gold transition-colors font-medium"

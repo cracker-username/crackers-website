@@ -1,9 +1,10 @@
 import React from "react";
 import { Metadata } from "next";
 import { Sparkles, ShieldCheck, MapPin, Award } from "lucide-react";
+import { DEFAULT_SITE_CONFIG } from "@/lib/settings/siteConfig";
 
 export const metadata: Metadata = {
-  title: "About Sivakasi Sparklers — Our Fireworks Heritage",
+  title: `About ${DEFAULT_SITE_CONFIG.name} — Our Fireworks Heritage`,
   description:
     "Learn about our Sivakasi fireworks heritage, stringent quality standards, and honest festival price-list estimation process.",
 };
@@ -17,7 +18,7 @@ export default function AboutPage() {
           <span>SIVAKASI FIREWORKS HERITAGE</span>
         </div>
         <h1 className="font-heading font-extrabold text-3xl sm:text-5xl text-foreground mb-4">
-          About Sivakasi Sparklers
+          About {DEFAULT_SITE_CONFIG.name}
         </h1>
         <p className="text-sm md:text-base leading-relaxed max-w-2xl mx-auto">
           Delivering joy, vibrant colors, and authentic festival celebrations directly from the fireworks capital of India.

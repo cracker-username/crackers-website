@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import { useCartStore } from "@/store/useCartStore";
 import { ThemeToggle } from "../ui/ThemeToggle";
+import { DEFAULT_SITE_CONFIG } from "@/lib/settings/siteConfig";
 
 interface HeaderProps {
   brandName?: string;
@@ -24,12 +25,15 @@ interface HeaderProps {
 }
 
 export function Header({
-  brandName = "Sivakasi Sparklers",
-  whatsappNumber = "919876543210",
-  phone = "+91 98765 43210",
+  brandName = DEFAULT_SITE_CONFIG.name,
+  whatsappNumber = DEFAULT_SITE_CONFIG.whatsappNumber,
+  phone = DEFAULT_SITE_CONFIG.phone,
   onOpenSearch,
   onOpenEnquiryDrawer,
 }: HeaderProps) {
+  const safeBrandName = (!brandName || brandName === "[BRAND_NAME]") ? DEFAULT_SITE_CONFIG.name : brandName;
+  const safePhone = (!phone || phone.includes("98765")) ? DEFAULT_SITE_CONFIG.phone : phone;
+  const safeWa = (!whatsappNumber || whatsappNumber.includes("98765")) ? DEFAULT_SITE_CONFIG.whatsappNumber : whatsappNumber;
   const pathname = usePathname();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
@@ -56,8 +60,8 @@ export function Header({
     { name: "Contact", href: "/contact" },
   ];
 
-  const cleanPhone = phone.replace(/[^0-9+]/g, "");
-  const cleanWa = whatsappNumber.replace(/[^0-9]/g, "");
+  const cleanPhone = safePhone.replace(/[^0-9+]/g, "");
+  const cleanWa = safeWa.replace(/[^0-9]/g, "");
 
   return (
     <header
@@ -72,14 +76,14 @@ export function Header({
         <Link
           href="/"
           className="flex items-center gap-2.5 group focus:outline-none focus:ring-2 focus:ring-accent-magenta rounded-lg p-1"
-          aria-label={`${brandName} Home`}
+          aria-label={`${safeBrandName} Home`}
         >
           <div className="w-9 h-9 md:w-10 md:h-10 rounded-xl bg-gradient-to-tr from-accent-magenta via-accent-orange to-accent-gold flex items-center justify-center text-white shadow-md shadow-accent-magenta/20 group-hover:scale-105 transition-transform">
             <Sparkles className="w-5 h-5 animate-pulse" />
           </div>
           <div className="flex flex-col">
             <span className="font-heading font-extrabold text-lg md:text-xl text-foreground tracking-tight leading-none group-hover:text-accent-gold transition-colors">
-              {brandName}
+              {safeBrandName}
             </span>
             <span className="text-[10px] md:text-xs font-semibold text-accent-gold tracking-wider uppercase">
               Sivakasi Direct
@@ -128,7 +132,7 @@ export function Header({
 
           {/* WhatsApp Direct Callout (Desktop) */}
           <a
-            href={`https://wa.me/${cleanWa}?text=Hello%20${encodeURIComponent(brandName)},%20I%20have%20an%20enquiry%20regarding%20crackers.`}
+            href={`https://wa.me/${cleanWa}?text=Hello%20${encodeURIComponent(safeBrandName)},%20I%20have%20an%20enquiry%20regarding%20crackers.`}
             target="_blank"
             rel="noopener noreferrer"
             className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 bg-emerald-600/20 text-emerald-400 hover:bg-emerald-600/30 border border-emerald-500/30 rounded-full text-xs font-bold transition-colors"
@@ -142,34 +146,33 @@ export function Header({
           <a
             href={`tel:${cleanPhone}`}
             className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 bg-white/10 hover:bg-white/15 text-foreground border border-white/15 rounded-full text-xs font-bold transition-colors"
-            aria-label={`Call ${phone}`}
+            aria-label={`Call ${safePhone}`}
           >
             <Phone className="w-3.5 h-3.5 text-accent-gold" />
             <span className="hidden xl:inline">Call Us</span>
           </a>
 
-          {/* Enquiry Cart Trigger with animated bump */}
+          {/* Enquiry Button with prominent text and count (Section 10 compliant) */}
           <button
             onClick={onOpenEnquiryDrawer}
             type="button"
-            className={`relative p-2.5 rounded-full bg-accent-magenta/15 hover:bg-accent-magenta/25 border border-accent-magenta/30 text-accent-magenta focus:outline-none focus:ring-2 focus:ring-accent-magenta transition-all ${
+            className={`relative flex items-center gap-2 px-3 py-2 rounded-full bg-accent-magenta/15 hover:bg-accent-magenta/25 border border-accent-magenta/30 text-accent-magenta focus:outline-none focus:ring-2 focus:ring-accent-magenta transition-all text-xs font-bold ${
               lastAddedItemId ? "animate-badge-bump" : ""
             }`}
             aria-label={`View Enquiry List (${isHydrated ? totalItems : 0} items)`}
           >
-            <ShoppingCart className="w-5 h-5" />
-            {isHydrated && totalItems > 0 && (
-              <span className="absolute -top-1 -right-1 bg-gradient-to-r from-accent-magenta to-accent-orange text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full min-w-[20px] text-center shadow-md animate-scale">
-                {totalItems}
-              </span>
-            )}
+            <ShoppingCart className="w-4 h-4" />
+            <span className="hidden sm:inline">Enquiry</span>
+            <span className="bg-gradient-to-r from-accent-magenta to-accent-orange text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full min-w-[18px] text-center shadow-md">
+              {isHydrated ? totalItems : 0}
+            </span>
           </button>
 
           {/* Mobile Hamburger Menu Trigger */}
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             type="button"
-            className="lg:hidden p-2 text-text-muted hover:text-foreground rounded-lg focus:outline-none focus:ring-2 focus:ring-accent-magenta"
+            className="lg:hidden p-2 text-text-muted hover:text-foreground rounded-lg focus:outline-none focus:ring-2 focus:ring-accent-magenta min-h-[44px] min-w-[44px] flex items-center justify-center"
             aria-label={mobileMenuOpen ? "Close Navigation Menu" : "Open Navigation Menu"}
             aria-expanded={mobileMenuOpen}
           >
@@ -208,10 +211,10 @@ export function Header({
                 <span>Call Us</span>
               </a>
               <a
-                href={`https://wa.me/${cleanWa}?text=Hello%20${encodeURIComponent(brandName)}`}
+                href={`https://wa.me/${cleanWa}?text=Hello%20${encodeURIComponent(safeBrandName)}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center gap-2 text-sm font-bold text-emerald-400"
+                className="flex items-center gap-2 text-sm font-bold text-emerald-400 min-h-[44px]"
               >
                 <MessageCircle className="w-4 h-4" />
                 <span>WhatsApp</span>

@@ -20,6 +20,8 @@ import {
   MapPin,
 } from "lucide-react";
 
+import { DEFAULT_SITE_CONFIG } from "@/lib/settings/siteConfig";
+
 interface SuccessPageProps {
   params: Promise<{ number: string }>;
   searchParams: Promise<{ token?: string }>;
@@ -30,7 +32,7 @@ export async function generateMetadata({
 }: SuccessPageProps): Promise<Metadata> {
   const { number } = await params;
   return {
-    title: `Enquiry ${number} Received — Sivakasi Sparklers`,
+    title: `Enquiry ${number} Received — ${DEFAULT_SITE_CONFIG.name}`,
     robots: { index: false, follow: false },
   };
 }
@@ -86,12 +88,19 @@ export default async function EnquirySuccessPage({
     prisma.setting.findUnique({ where: { key: "whatsappNumber" } }),
   ]);
 
-  const businessName = bizNameSetting ? (parseSettingValue("businessName", bizNameSetting.value) as string) : "Sivakasi Sparklers";
-  const businessPhone = bizPhoneSetting ? (parseSettingValue("phone", bizPhoneSetting.value) as string) : "+919876543210";
-  const whatsappNumber = whatsappSetting ? (parseSettingValue("whatsappNumber", whatsappSetting.value) as string) : "919876543210";
+  let businessName = bizNameSetting ? (parseSettingValue("businessName", bizNameSetting.value) as string) : DEFAULT_SITE_CONFIG.name;
+  if (!businessName || businessName === "[BRAND_NAME]") businessName = DEFAULT_SITE_CONFIG.name;
+
+  let businessPhone = bizPhoneSetting ? (parseSettingValue("phone", bizPhoneSetting.value) as string) : DEFAULT_SITE_CONFIG.phone;
+  if (!businessPhone || businessPhone.includes("98765")) businessPhone = DEFAULT_SITE_CONFIG.phone;
+
+  let whatsappNumber = whatsappSetting ? (parseSettingValue("whatsappNumber", whatsappSetting.value) as string) : DEFAULT_SITE_CONFIG.whatsappNumber;
+  if (!whatsappNumber || whatsappNumber.includes("98765")) whatsappNumber = DEFAULT_SITE_CONFIG.whatsappNumber;
+
+  const siteUrl = (process.env.NEXT_PUBLIC_APP_URL || process.env.NEXT_PUBLIC_SITE_URL || DEFAULT_SITE_CONFIG.siteUrl).replace(/\/$/, "");
 
   // Build safe WhatsApp prefill link
-  const summaryUrl = `https://crackers.local/enquiry/summary/${enquiryNumber}?token=${encodeURIComponent(token || "")}`;
+  const summaryUrl = `${siteUrl}/enquiry/summary/${enquiryNumber}?token=${encodeURIComponent(token || "")}`;
   const whatsappUrl = buildWhatsAppLink({
     businessName,
     whatsappNumber,

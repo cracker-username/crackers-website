@@ -87,7 +87,7 @@ test.describe("Public Catalogue & Enquiry Journey", () => {
     await expect(page.locator("h1")).toContainText("Track Your Enquiry");
 
     const enquiryInput = page.getByPlaceholder(/CE-26-000001/i).or(page.locator("input[placeholder*='CE-']"));
-    const mobileInput = page.getByPlaceholder("9876543210").or(page.locator("input[type='tel']"));
+    const mobileInput = page.getByPlaceholder("9172600587").or(page.getByPlaceholder("9876543210")).or(page.locator("input[type='tel']"));
     const trackBtn = page.getByRole("button", { name: /^Track Enquiry$/i }).or(page.locator("button[type='submit']"));
 
     await expect(enquiryInput).toBeVisible();

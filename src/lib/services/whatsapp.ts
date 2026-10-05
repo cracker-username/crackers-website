@@ -4,7 +4,7 @@ export interface WhatsAppEnquiryDetails {
   businessName: string;
   whatsappNumber: string;
   enquiryNumber: string;
-  customerName: string;
+  customerName?: string;
   location: string; // e.g. "Chennai, Tamil Nadu"
   items: Array<{ name: string; quantity: number }>;
   totalEstimatePaise: number;
@@ -12,26 +12,41 @@ export interface WhatsAppEnquiryDetails {
 }
 
 /**
- * Generates a clean, url-encoded wa.me link with fallback truncation
- * keeping total URL string comfortably under 1,500 characters.
+ * Generates a clean, url-encoded wa.me link matching the canonical template:
+ * 
+ * Hello {{businessName}},
+ * 
+ * I would like to enquire about:
+ * 
+ * Enquiry ID: {{enquiryId}}
+ * 
+ * Products:
+ * {{productList}}
+ * 
+ * Total:
+ * ₹{{total}}
+ * 
+ * Location:
+ * {{state}}, {{city}}
+ * 
+ * Please confirm availability and delivery details.
  */
 export function buildWhatsAppLink(details: WhatsAppEnquiryDetails): string {
   const cleanNumber = details.whatsappNumber.replace(/[^0-9]/g, "");
 
-  const header = `*${details.businessName} — Enquiry Confirmation*\n\n` +
-    `Hello, I would like to confirm my cracker enquiry.\n` +
-    `*Enquiry No:* ${details.enquiryNumber}\n` +
-    `*Name:* ${details.customerName}\n` +
-    `*Location:* ${details.location}\n\n` +
-    `*Items:*\n`;
+  const greeting = `Hello ${details.businessName},\n\n` +
+    `I would like to enquire about:\n\n` +
+    `Enquiry ID: ${details.enquiryNumber}\n\n` +
+    (details.customerName ? `Customer: ${details.customerName}\n\n` : "") +
+    `Products:\n`;
 
-  const footer = `\n*Estimated Total:* ${formatPaise(details.totalEstimatePaise)}\n` +
-    (details.summaryUrl ? `*View Summary:* ${details.summaryUrl}\n` : "") +
-    `\nPlease verify availability and confirm my order via call or WhatsApp. Thank you!`;
+  const footer = `\nTotal:\n${formatPaise(details.totalEstimatePaise)}\n\n` +
+    `Location:\n${details.location}\n\n` +
+    `Please confirm availability and delivery details.` +
+    (details.summaryUrl ? `\n\nView Summary: ${details.summaryUrl}` : "");
 
-  // Start with all items and progressively truncate if encoded length > 1400
   let itemsText = "";
-  let itemsCount = details.items.length;
+  const itemsCount = details.items.length;
 
   for (let limit = itemsCount; limit >= 0; limit--) {
     const included = details.items.slice(0, limit);
@@ -45,7 +60,7 @@ export function buildWhatsAppLink(details: WhatsAppEnquiryDetails): string {
       itemsText += `\n... + ${omitted} more items`;
     }
 
-    const fullMessage = header + itemsText + footer;
+    const fullMessage = greeting + itemsText + footer;
     const testUrl = `https://wa.me/${cleanNumber}?text=${encodeURIComponent(fullMessage)}`;
 
     if (testUrl.length <= 1400 || limit === 0) {
@@ -53,7 +68,7 @@ export function buildWhatsAppLink(details: WhatsAppEnquiryDetails): string {
     }
   }
 
-  // Fallback minimal message
-  const minimalMsg = header + `(Total items: ${itemsCount})\n` + footer;
+  // Fallback minimal message for huge lists
+  const minimalMsg = greeting + `(${itemsCount} items selected)` + footer;
   return `https://wa.me/${cleanNumber}?text=${encodeURIComponent(minimalMsg)}`;
 }

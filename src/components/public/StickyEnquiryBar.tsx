@@ -2,19 +2,21 @@
 
 import React from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { ArrowRight, CheckCircle2, AlertCircle } from "lucide-react";
 import { useCartStore } from "@/store/useCartStore";
 import { formatPaise } from "@/lib/utils/money";
 import { Button } from "../ui/Button";
 
 export function StickyEnquiryBar() {
+  const pathname = usePathname();
   const isHydrated = useCartStore((state) => state.isHydrated);
   const totalItems = useCartStore((state) => state.getTotalItems());
   const subtotalPaise = useCartStore((state) => state.getSubtotalPaise());
   const selectedState = useCartStore((state) => state.selectedState);
 
-  if (!isHydrated || totalItems === 0) {
-    return null; // Only render when cart has items
+  if (!isHydrated || totalItems === 0 || pathname?.startsWith("/enquiry")) {
+    return null; // Only render when cart has items and not already on enquiry review page
   }
 
   // Minimum order logic: TN/PY ₹3,000; Others ₹5,000

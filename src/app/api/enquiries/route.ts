@@ -6,6 +6,7 @@ import { generateEnquiryToken } from "@/lib/utils/token";
 import { buildWhatsAppLink } from "@/lib/services/whatsapp";
 import { prisma } from "@/lib/db/prisma";
 import { parseSettingValue } from "@/lib/settings/registry";
+import { DEFAULT_SITE_CONFIG } from "@/lib/settings/siteConfig";
 
 export async function POST(req: NextRequest) {
   try {
@@ -80,8 +81,11 @@ export async function POST(req: NextRequest) {
       prisma.setting.findUnique({ where: { key: "whatsappNumber" } }),
     ]);
 
-    const businessName = bizNameSetting ? parseSettingValue("businessName", bizNameSetting.value) : "Sivakasi Sparklers";
-    const whatsappNumber = bizPhoneSetting ? parseSettingValue("whatsappNumber", bizPhoneSetting.value) : "919876543210";
+    let businessName = bizNameSetting ? parseSettingValue("businessName", bizNameSetting.value) : DEFAULT_SITE_CONFIG.name;
+    if (!businessName || businessName === "[BRAND_NAME]") businessName = DEFAULT_SITE_CONFIG.name;
+
+    let whatsappNumber = bizPhoneSetting ? parseSettingValue("whatsappNumber", bizPhoneSetting.value) : DEFAULT_SITE_CONFIG.whatsappNumber;
+    if (!whatsappNumber || whatsappNumber.includes("98765")) whatsappNumber = DEFAULT_SITE_CONFIG.whatsappNumber;
 
     const origin = req.headers.get("origin") || req.nextUrl.origin || "http://localhost:3000";
     const summaryUrl = `${origin}/enquiry/summary/${enquiryNumber}?token=${token}`;

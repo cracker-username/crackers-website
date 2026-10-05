@@ -96,7 +96,7 @@ model Product {
   category       Category       @relation(fields: [categoryId], references: [id])
   shortDesc      String?
   longDesc       String?
-  brand          String?        @default("[BRAND_NAME]")
+  brand          String?        @default("FESTIVO FIREWORKS")
   packSize       String         // e.g. "1 Box", "5 Pcs"
   unit           String         // e.g. "Box", "Pack"
   mrpPaise       Int            // Integer paise (e.g., 50000 = Rs 500.00)
