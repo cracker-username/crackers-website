@@ -104,40 +104,40 @@ export function ChangePasswordModal({ isOpen, onClose, isForced = false }: Chang
         ) : (
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block text-xs font-semibold text-text mb-1">
+              <label className="block text-xs font-semibold text-white/90 mb-1">
                 Current Password
               </label>
               <input
                 type="password"
                 value={currentPassword}
                 onChange={(e) => setCurrentPassword(e.target.value)}
-                className="w-full px-3 py-2 rounded-lg bg-surface-2 border border-border text-sm text-text focus:outline-none focus:border-accent-gold"
+                className="w-full px-3 py-2.5 rounded-lg bg-bg-0 border border-white/20 text-sm text-white placeholder:text-white/40 focus:outline-none focus:border-accent-gold focus:ring-1 focus:ring-accent-gold font-medium"
                 required
               />
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-text mb-1">
+              <label className="block text-xs font-semibold text-white/90 mb-1">
                 New Password (minimum 10 characters)
               </label>
               <input
                 type="password"
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
-                className="w-full px-3 py-2 rounded-lg bg-surface-2 border border-border text-sm text-text focus:outline-none focus:border-accent-gold"
+                className="w-full px-3 py-2.5 rounded-lg bg-bg-0 border border-white/20 text-sm text-white placeholder:text-white/40 focus:outline-none focus:border-accent-gold focus:ring-1 focus:ring-accent-gold font-medium"
                 required
               />
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-text mb-1">
+              <label className="block text-xs font-semibold text-white/90 mb-1">
                 Confirm New Password
               </label>
               <input
                 type="password"
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
-                className="w-full px-3 py-2 rounded-lg bg-surface-2 border border-border text-sm text-text focus:outline-none focus:border-accent-gold"
+                className="w-full px-3 py-2.5 rounded-lg bg-bg-0 border border-white/20 text-sm text-white placeholder:text-white/40 focus:outline-none focus:border-accent-gold focus:ring-1 focus:ring-accent-gold font-medium"
                 required
               />
             </div>

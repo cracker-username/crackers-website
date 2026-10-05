@@ -10,6 +10,9 @@
     --bg-0: #070418;
     --bg-1: #0F0A33;
     --surface: rgba(255, 255, 255, 0.08);
+    --surface-1: #0F0A33;
+    --surface-2: #160F45;
+    --surface-3: #221861;
     --surface-raised: rgba(255, 255, 255, 0.12);
     --surface-glass: rgba(15, 10, 51, 0.75);
     --text-main: #F6F3FF;
@@ -39,6 +42,9 @@
     --bg-0: #FFF9F0;
     --bg-1: #FFFFFF;
     --surface: #FFFFFF;
+    --surface-1: #FFFFFF;
+    --surface-2: #F8F3EA;
+    --surface-3: #EDE5D8;
     --surface-raised: #F4EBE1;
     --surface-glass: rgba(255, 249, 240, 0.85);
     --text-main: #1B1038;
@@ -60,6 +66,17 @@
     --price-mrp: #8A819F;
     --price-discount: #15803D;
   }
+}
+
+/* Fix browser autofill on dark inputs */
+input:-webkit-autofill,
+input:-webkit-autofill:hover, 
+input:-webkit-autofill:focus, 
+input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 1000px #0F0A33 inset !important;
+  -webkit-text-fill-color: #FFFFFF !important;
+  caret-color: #FFFFFF !important;
+  transition: background-color 5000s ease-in-out 0s;
 }
 
 body {
